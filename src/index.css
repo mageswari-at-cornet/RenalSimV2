@@ -1,0 +1,213 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+/* Tailwind CSS v4 uses CSS-based configuration */
+@import "tailwindcss";
+
+/* Custom theme configuration for Tailwind v4 */
+@theme {
+  /* Colors */
+  --color-renal-bg: #0b1220;
+  --color-renal-panel: #121b2a;
+  --color-renal-panel-secondary: #0f1725;
+  --color-renal-border: #1e2a3a;
+  --color-renal-text: #e9eef7;
+  --color-renal-muted: #9aa8bb;
+
+  --color-rs-blue: #2f7df6;
+  --color-rs-green: #23d18b;
+  --color-rs-amber: #ffb020;
+  --color-rs-red: #ff4d4f;
+  --color-rs-violet: #8b5cf6;
+
+  /* Fonts */
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+
+  /* Font sizes */
+  --text-kpi: 30px;
+  --text-kpi--line-height: 1.2;
+  --text-kpi--font-weight: 900;
+
+  --text-kpi-lg: 36px;
+  --text-kpi-lg--line-height: 1.2;
+  --text-kpi-lg--font-weight: 900;
+
+  /* Shadows */
+  --shadow-card: 0 6px 18px rgba(0, 0, 0, 0.25);
+
+  /* Animations */
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-shimmer: shimmer 1.5s infinite;
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+
+    100% {
+      background-position: 200% 0;
+    }
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-renal-bg text-renal-text font-sans antialiased;
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+  }
+}
+
+/* Component styles - using direct CSS instead of @apply for custom classes */
+@layer components {
+  .card {
+    background: linear-gradient(to bottom right, var(--color-renal-panel), var(--color-renal-panel-secondary));
+    border: 1px solid var(--color-renal-border);
+    border-radius: 14px;
+    padding: 1rem;
+    box-shadow: var(--shadow-card);
+  }
+
+  .card-kpi {
+    background: linear-gradient(to bottom right, var(--color-renal-panel), var(--color-renal-panel-secondary));
+    border: 1px solid var(--color-renal-border);
+    border-radius: 14px;
+    padding: 1rem;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 110px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-width: 1px;
+    border-style: solid;
+  }
+
+  .badge-risk-high {
+    border-color: var(--color-rs-red);
+    color: var(--color-rs-red);
+    background-color: rgb(255 77 79 / 0.1);
+  }
+
+  .badge-risk-medium {
+    border-color: var(--color-rs-amber);
+    color: var(--color-rs-amber);
+    background-color: rgb(255 176 32 / 0.1);
+  }
+
+  .badge-risk-low {
+    border-color: var(--color-rs-green);
+    color: var(--color-rs-green);
+    background-color: rgb(35 209 139 / 0.1);
+  }
+
+  .text-risk-high {
+    color: var(--color-rs-red);
+  }
+
+  .text-risk-medium {
+    color: var(--color-rs-amber);
+  }
+
+  .text-risk-low {
+    color: var(--color-rs-green);
+  }
+
+  .bg-risk-high {
+    background-color: rgb(255 77 79 / 0.1);
+  }
+
+  .bg-risk-medium {
+    background-color: rgb(255 176 32 / 0.1);
+  }
+
+  .bg-risk-low {
+    background-color: rgb(35 209 139 / 0.1);
+  }
+
+  .btn-primary {
+    padding: 0.5rem 1rem;
+    background-color: var(--color-rs-blue);
+    color: white;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 150ms;
+  }
+
+  .btn-primary:hover {
+    filter: brightness(1.1);
+  }
+
+  .btn-secondary {
+    padding: 0.5rem 1rem;
+    background-color: transparent;
+    border: 1px solid var(--color-rs-blue);
+    color: var(--color-rs-blue);
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 150ms;
+  }
+
+  .btn-secondary:hover {
+    background-color: rgb(47 125 246 / 0.1);
+  }
+
+  .btn-danger {
+    padding: 0.5rem 1rem;
+    background-color: var(--color-rs-red);
+    color: white;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 150ms;
+  }
+
+  .btn-danger:hover {
+    filter: brightness(1.1);
+  }
+
+  .tab-active {
+    border-bottom: 3px solid var(--color-rs-blue);
+    color: var(--color-renal-text);
+  }
+
+  .tab-inactive {
+    border-bottom: 3px solid transparent;
+    color: var(--color-renal-muted);
+    transition: all 150ms;
+  }
+
+  .tab-inactive:hover {
+    color: var(--color-renal-text);
+    background-color: rgb(255 255 255 / 0.05);
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #1e2a3a transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #1e2a3a;
+    border-radius: 3px;
+  }
+}
