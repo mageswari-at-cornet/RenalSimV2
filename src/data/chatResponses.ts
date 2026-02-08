@@ -1,23 +1,24 @@
 import type { Patient } from '../types';
 
-export type QuestionType = 'risks' | 'alerts' | 'schedule' | 'access' | 'summary' | 'cvc_harm' | 'longer_sessions' | 'bp_drop' | 'uf_rate' | 'unknown';
+export type QuestionType = 'risks' | 'alerts' | 'schedule' | 'access' | 'summary' | 'cvc_harm' | 'longer_sessions' | 'bp_drop' | 'uf_rate' | 'adequacy_masking' | 'unknown';
 
 export const detectQuestionType = (input: string): QuestionType => {
   const lower = input.toLowerCase();
-  
+
   // New specific questions
   if (lower.match(/cvc.*harm|harm.*cvc|catheter.*harm|continuing.*cvc/)) return 'cvc_harm';
   if (lower.match(/longer.*session|session.*longer|extend.*time|longer.*dialysis/)) return 'longer_sessions';
   if (lower.match(/blood pressure.*drop|bp.*drop|hypotension|last hour/)) return 'bp_drop';
   if (lower.match(/uf rate|ultrafiltration.*rate|appropriate.*uf/)) return 'uf_rate';
-  
+  if (lower.match(/adequacy.*masking|dose.*masking|ischemic.*injury|biologic.*injury/)) return 'adequacy_masking';
+
   // Existing questions
   if (lower.match(/risk|mortality|prognosis|how bad|danger|concern/)) return 'risks';
   if (lower.match(/alert|warning|critical|serious|issue|problem/)) return 'alerts';
   if (lower.match(/schedule|dialysis|sessions|frequency|how often|times per week/)) return 'schedule';
   if (lower.match(/access|fistula|graft|catheter|cvc|vp|venous pressure/)) return 'access';
   if (lower.match(/summarize|summary|overview|status|tell me about|patient info/)) return 'summary';
-  
+
   return 'unknown';
 };
 
@@ -26,13 +27,13 @@ export const generateResponse = (patient: Patient, questionType: QuestionType): 
   const warningCount = patient.alerts.filter(a => a.severity === 'warning').length;
   const criticalAlerts = patient.alerts.filter(a => a.severity === 'critical');
   const firstCritical = criticalAlerts[0];
-  
-  const accessFullName = patient.accessType === 'CVC' 
-    ? 'Central Venous Catheter' 
-    : patient.accessType === 'AVF' 
-    ? 'Arteriovenous Fistula' 
-    : 'Arteriovenous Graft';
-  
+
+  const accessFullName = patient.accessType === 'CVC'
+    ? 'Central Venous Catheter'
+    : patient.accessType === 'AVF'
+      ? 'Arteriovenous Fistula'
+      : 'Arteriovenous Graft';
+
   const deltaDirection30d = patient.mortalityDelta['30d'] > 0 ? 'upward' : 'downward';
 
   switch (questionType) {
@@ -47,6 +48,9 @@ export const generateResponse = (patient: Patient, questionType: QuestionType): 
 
     case 'uf_rate':
       return `The UF rate appears acceptable overall, but given this patient's ${patient.riskLevel.toLowerCase()} risk profile, even modest UF stress may trigger hypotension. Close monitoring and late-session UF adjustment are warranted.`;
+
+    case 'adequacy_masking':
+      return `**Yes.** Although conventional adequacy metrics show no clearance alerts, the patient’s 1-year mortality risk remains extremely high. This suggests that standard dose metrics are failing to capture ongoing vascular and inflammatory injury driven by non-clearance factors.`;
 
     case 'risks':
       return `Based on current data, **${patient.name}** has a **${patient.riskLevel.toUpperCase()}** overall risk profile.
@@ -63,10 +67,10 @@ export const generateResponse = (patient: Patient, questionType: QuestionType): 
 Risk is trending ${deltaDirection30d} over 30 days.`;
 
     case 'alerts':
-      const alertList = patient.alerts.map((alert, idx) => 
+      const alertList = patient.alerts.map((alert, idx) =>
         `${idx + 1}. **${alert.type}** - ${alert.description} (${alert.severity.toUpperCase()})`
       ).join('\n');
-      
+
       return `There are **${patient.alerts.length} active alerts**:
 
 ${alertList}
@@ -75,10 +79,10 @@ ${criticalCount > 0 ? `⚠️ **Action Required:** ${criticalCount} critical ale
 
     case 'schedule':
       const hoursPerSession = (patient.schedule.durationPerSession / 60).toFixed(1);
-      const scheduleAssessment = patient.schedule.durationPerSession < 240 
+      const scheduleAssessment = patient.schedule.durationPerSession < 240
         ? 'suboptimal - consider extending session time'
         : 'adequate';
-      
+
       return `**${patient.name}** is on a **${patient.schedule.daysPerWeek}-days-per-week** dialysis schedule.
 
 **Session Details:**
@@ -98,7 +102,7 @@ ${criticalCount > 0 ? `⚠️ **Action Required:** ${criticalCount} critical ale
       } else {
         accessWarning = 'The AVF appears to be the preferred access type with lower complication rates.';
       }
-      
+
       return `**Access Type:** ${patient.accessType} (${accessFullName})
 
 **Current Status:**
@@ -111,10 +115,10 @@ ${patient.phenotype.find(p => p.includes('vintage')) || 'Patient has been on dia
 ${patient.accessType === 'CVC' ? '• Plan for AVF/AVG creation\n• Monitor for infection signs\n• Maintain strict sterile technique' : patient.accessType === 'AVG' ? '• Monitor VP trends\n• Schedule access flow study\n• Watch for prolonged bleeding' : '• Continue routine monitoring\n• Palpate for thrill regularly\n• Report any changes immediately'}`;
 
     case 'summary':
-      const alertSummary = patient.alerts.length > 0 
-        ? `${patient.alerts.length} active alert${patient.alerts.length !== 1 ? 's' : ''} (${criticalCount} critical)` 
+      const alertSummary = patient.alerts.length > 0
+        ? `${patient.alerts.length} active alert${patient.alerts.length !== 1 ? 's' : ''} (${criticalCount} critical)`
         : 'No active alerts';
-      
+
       return `**Patient Summary: ${patient.name}** (${patient.id})
 
 **Demographics:** ${patient.age}-year-old ${patient.sex} with ${patient.primaryDiagnosis}
@@ -155,4 +159,5 @@ export const suggestedPrompts = [
   { id: '2', text: 'Would longer dialysis sessions help this patient?', category: 'longer_sessions' },
   { id: '3', text: 'Why does blood pressure drop in the last hour of dialysis?', category: 'bp_drop' },
   { id: '4', text: 'Is the current UF rate appropriate for this patient?', category: 'uf_rate' },
+  { id: '5', text: 'Is dialysis adequacy masking cumulative ischemic or biologic injury?', category: 'adequacy_masking' },
 ];
