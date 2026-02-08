@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -14,7 +14,7 @@ interface FacilityFilterSectionProps {
   onFilterChange: (filters: FilterState) => void;
 }
 
-const FACILITIES = ['Center A', 'Center B', 'Center C', 'Center D', 'Center E'];
+const FACILITIES = ['Center A', 'Center B', 'Center C'];
 const ACCESS_TYPES = ['AVF', 'AVG', 'CVC'];
 
 export const FacilityFilterSection: React.FC<FacilityFilterSectionProps> = ({ onFilterChange }) => {
@@ -22,8 +22,20 @@ export const FacilityFilterSection: React.FC<FacilityFilterSectionProps> = ({ on
     facilities: [],
     accessTypes: [],
     minMortality: 0,
-    topN: 50,
+    topN: 6,
   });
+
+  // Only call onFilterChange when filters actually change (not on initial mount)
+  const isInitialMount = React.useRef(true);
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      // Send initial state to parent
+      onFilterChange(filters);
+    } else {
+      onFilterChange(filters);
+    }
+  }, [filters, onFilterChange]);
 
   const toggleFacility = (facility: string) => {
     setFilters(prev => ({
@@ -48,13 +60,7 @@ export const FacilityFilterSection: React.FC<FacilityFilterSectionProps> = ({ on
       facilities: [],
       accessTypes: [],
       minMortality: 0,
-      topN: 50,
-    });
-    onFilterChange({
-      facilities: [],
-      accessTypes: [],
-      minMortality: 0,
-      topN: 50,
+      topN: 6,
     });
   };
 
@@ -120,7 +126,7 @@ export const FacilityFilterSection: React.FC<FacilityFilterSectionProps> = ({ on
           max="100"
           step="5"
           value={filters.minMortality}
-          onChange={(e) => setFilters(prev => ({ ...prev, minMortality: parseInt(e.target.value) }))}
+          onInput={(e) => setFilters(prev => ({ ...prev, minMortality: parseInt((e.target as HTMLInputElement).value) }))}
           className="w-full accent-rs-blue"
         />
       </div>
@@ -135,13 +141,17 @@ export const FacilityFilterSection: React.FC<FacilityFilterSectionProps> = ({ on
         </div>
         <input
           type="range"
-          min="10"
-          max="100"
-          step="10"
+          min="1"
+          max="6"
+          step="1"
           value={filters.topN}
-          onChange={(e) => setFilters(prev => ({ ...prev, topN: parseInt(e.target.value) }))}
+          onInput={(e) => setFilters(prev => ({ ...prev, topN: parseInt((e.target as HTMLInputElement).value) }))}
           className="w-full accent-rs-blue"
         />
+        <div className="flex justify-between text-xs text-renal-muted mt-1">
+          <span>1</span>
+          <span>6 (all)</span>
+        </div>
       </div>
 
       {/* Action Buttons */}

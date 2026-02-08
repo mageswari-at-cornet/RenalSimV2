@@ -43,6 +43,10 @@ export interface Patient {
   };
   riskLevel: RiskLevel;
   mortalityRisk: MortalityRisk;
+  hospitalizationRisk: {
+    '30d': number;
+    '90d': number;
+  };
   mortalityDelta: {
     '30d': number;
     '90d': number;
@@ -52,6 +56,9 @@ export interface Patient {
   topRiskFactor: string;
   phenotype: string[];
   lastUpdated: string;
+  facility: 'Center A' | 'Center B' | 'Center C';
+  accessType: 'AVF' | 'AVG' | 'CVC';
+  archetype: string;
 }
 
 export interface SessionData {
@@ -153,4 +160,4 @@ export interface CausalPathway {
   narrative: string;
 }
 
-export type TabType = 'overview' | 'session' | 'adequacy' | 'access' | 'labs' | 'events' | 'quality';
+export type TabType = 'overview' | 'volume' | 'session' | 'adequacy' | 'access' | 'labs' | 'events' | 'quality';

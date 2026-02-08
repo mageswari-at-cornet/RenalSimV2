@@ -20,12 +20,6 @@ export const AccessTab: React.FC<AccessTabProps> = ({ patient }) => {
     y: s.vp,
   })).reverse();
 
-  const accessEvents = [
-    { date: '2023-12-10', event: 'Bleeding', severity: 'Moderate' },
-    { date: '2023-11-22', event: 'Infection', severity: 'Mild' },
-    { date: '2023-09-15', event: 'Clotting', severity: 'Moderate' },
-  ];
-
   const riskScore = 72;
 
   return (
@@ -152,57 +146,7 @@ export const AccessTab: React.FC<AccessTabProps> = ({ patient }) => {
         </div>
       </Card>
 
-      {/* Complications and Event Log */}
-      <Card>
-        <h3 className="text-sm font-semibold text-renal-text mb-4">Access Event Log</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-renal-border">
-                <th className="text-left px-4 py-2 text-xs font-bold text-renal-muted uppercase">Date</th>
-                <th className="text-left px-4 py-2 text-xs font-bold text-renal-muted uppercase">Event</th>
-                <th className="text-left px-4 py-2 text-xs font-bold text-renal-muted uppercase">Severity</th>
-              </tr>
-            </thead>
-            <tbody>
-              {accessEvents.map((event, idx) => (
-                <tr key={idx} className="border-b border-renal-border/50">
-                  <td className="px-4 py-2 text-sm text-renal-text">{event.date}</td>
-                  <td className="px-4 py-2 text-sm text-renal-text">{event.event}</td>
-                  <td className="px-4 py-2">
-                    <span className={cn(
-                      'text-xs px-2 py-1 rounded-full',
-                      event.severity === 'High' ? 'bg-rs-red/20 text-rs-red' :
-                      event.severity === 'Moderate' ? 'bg-rs-amber/20 text-rs-amber' :
-                      'bg-rs-blue/20 text-rs-blue'
-                    )}>
-                      {event.severity}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
 
-        <div className="mt-4 p-3 bg-renal-bg rounded-lg">
-          <h4 className="text-xs font-medium text-renal-muted uppercase mb-2">CVC Infection Risk</h4>
-          <div className="space-y-1 text-sm">
-            <div className="flex justify-between">
-              <span className="text-renal-muted">Days since insertion</span>
-              <span className="text-rs-amber font-medium">164 days</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-renal-muted">Entry site status</span>
-              <span className="text-rs-green">Clean, no erythema</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-renal-muted">Recent fever</span>
-              <span className="text-rs-green">None</span>
-            </div>
-          </div>
-        </div>
-      </Card>
     </div>
   );
 };

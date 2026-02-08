@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import { Card } from '../../components/ui/Card';
 import { KPICard } from '../../components/ui/KPICard';
 import { TrendChart } from '../../components/charts/TrendChart';
-import { BarChartComponent } from '../../components/charts/BarChart';
 import { generateMockSessions } from '../../data/mockData';
 import { cn } from '../../utils/cn';
 import type { Patient } from '../../types';
@@ -12,7 +11,7 @@ interface AdequacyTabProps {
 }
 
 export const AdequacyTab: React.FC<AdequacyTabProps> = ({ patient }) => {
-  const sessions = useMemo(() => generateMockSessions(patient.id).slice(0, 30), [patient.id]);
+  const sessions = useMemo(() => generateMockSessions(patient.id).slice(0, 5), [patient.id]);
 
   const stats = useMemo(() => {
     const recentSessions = sessions.slice(0, 6);
@@ -33,14 +32,6 @@ export const AdequacyTab: React.FC<AdequacyTabProps> = ({ patient }) => {
     x: s.date.slice(5),
     y: s.spktv,
   })).reverse();
-
-  const adequacyDrivers = [
-    { name: 'Session time shortfall', value: 35, color: '#ff4d4f' },
-    { name: 'Blood flow reduction', value: 28, color: '#ffb020' },
-    { name: 'Access flow limitation', value: 22, color: '#2f7df6' },
-    { name: 'Clotting/recirculation', value: 10, color: '#8b5cf6' },
-    { name: 'Missed sessions', value: 5, color: '#23d18b' },
-  ];
 
   return (
     <div className="space-y-6">
@@ -72,41 +63,25 @@ export const AdequacyTab: React.FC<AdequacyTabProps> = ({ patient }) => {
         />
       </div>
 
-      {/* spKt/V Trend and Drivers */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2">
-          <h3 className="text-sm font-semibold text-renal-text mb-4">spKt/V Trend Analysis</h3>
-          <div className="h-64">
-            <TrendChart
-              data={spktvTrendData}
-              targetValue={1.4}
-              warningValue={1.2}
-              color="#2f7df6"
-            />
+      {/* spKt/V Trend */}
+      <Card>
+        <h3 className="text-sm font-semibold text-renal-text mb-4">spKt/V Trend Analysis</h3>
+        <div className="h-64">
+          <TrendChart
+            data={spktvTrendData}
+            targetValue={1.4}
+            warningValue={1.2}
+            color="#2f7df6"
+          />
+        </div>
+        {parseFloat(stats.meanSpKtV) < 1.2 && (
+          <div className="mt-4 p-3 bg-rs-red/10 border border-rs-red/30 rounded-lg">
+            <p className="text-sm text-rs-red">
+              ⚠️ Warning: spKt/V below 1.2 for 2+ consecutive sessions
+            </p>
           </div>
-          {parseFloat(stats.meanSpKtV) < 1.2 && (
-            <div className="mt-4 p-3 bg-rs-red/10 border border-rs-red/30 rounded-lg">
-              <p className="text-sm text-rs-red">
-                ⚠️ Warning: spKt/V below 1.2 for 2+ consecutive sessions
-              </p>
-            </div>
-          )}
-        </Card>
-
-        <Card>
-          <h3 className="text-sm font-semibold text-renal-text mb-4">Adequacy Drivers</h3>
-          <div className="h-64">
-            <BarChartComponent
-              data={adequacyDrivers}
-              horizontal
-            />
-          </div>
-          <div className="mt-4 p-3 bg-renal-bg rounded-lg">
-            <div className="text-xs text-renal-muted mb-1">Cumulative Adequacy Debt</div>
-            <div className="text-lg font-bold text-rs-amber">2.4 units</div>
-          </div>
-        </Card>
-      </div>
+        )}
+      </Card>
 
       {/* Delivery Performance Table */}
       <Card>
@@ -125,7 +100,7 @@ export const AdequacyTab: React.FC<AdequacyTabProps> = ({ patient }) => {
               </tr>
             </thead>
             <tbody>
-              {sessions.slice(0, 10).map((session, idx) => {
+              {sessions.slice(0, 5).map((session, idx) => {
                 const deliveryRatio = ((session.duration / session.prescribedDuration) * 100).toFixed(0);
                 return (
                   <tr key={idx} className="border-b border-renal-border/50 hover:bg-white/5">

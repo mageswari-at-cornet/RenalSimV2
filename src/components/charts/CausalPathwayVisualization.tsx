@@ -103,7 +103,7 @@ export const CausalPathwayVisualization: React.FC<CausalPathwayVisualizationProp
   const currentPathway = pathways.find(p => p.id === selectedPathway) || pathways[0];
 
   return (
-    <div className="bg-gradient-to-br from-renal-panel to-renal-panel-secondary border border-renal-border rounded-[14px] p-5 shadow-card mb-6">
+    <div className="bg-gradient-to-br from-renal-panel to-renal-panel-secondary border border-renal-border rounded-[14px] p-5 shadow-card h-full">
       <h3 className="text-lg font-semibold text-renal-text mb-4">Active Causal Pathways</h3>
       
       {/* Pathway Selector */}

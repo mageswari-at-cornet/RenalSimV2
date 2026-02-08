@@ -11,7 +11,7 @@ interface SessionDataTabProps {
 }
 
 export const SessionDataTab: React.FC<SessionDataTabProps> = ({ patient }) => {
-  const sessions = useMemo(() => generateMockSessions(patient.id).slice(0, 12), [patient.id]);
+  const sessions = useMemo(() => generateMockSessions(patient.id).slice(0, 5), [patient.id]);
   
   // Next Session Plan state
   const [nextSessionPlan, setNextSessionPlan] = useState({

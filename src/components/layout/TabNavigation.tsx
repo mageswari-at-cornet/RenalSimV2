@@ -10,6 +10,7 @@ interface TabNavigationProps {
 const tabs: { id: TabType; label: string }[] = [
   { id: 'overview', label: 'Overview' },
   { id: 'session', label: 'Session Data' },
+  { id: 'volume', label: 'Volume & BP' },
   { id: 'adequacy', label: 'Adequacy' },
   { id: 'access', label: 'Access' },
   { id: 'labs', label: 'Labs & Meds' },

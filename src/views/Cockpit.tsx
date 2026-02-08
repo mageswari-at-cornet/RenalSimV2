@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, AlertCircle, Info, ChevronUp, ChevronDown } from 'lucide-react';
-import { Header } from '../components/layout/Header';
 import { Card } from '../components/ui/Card';
 import { KPICard } from '../components/ui/KPICard';
 import { RiskMixGraph } from '../components/charts/RiskMixGraph';
@@ -10,9 +9,9 @@ import { mockPatients } from '../data/mockData';
 import { cn } from '../utils/cn';
 import type { AlertSeverity } from '../types';
 
-type SortField = 'id' | 'name' | 'mortality30d' | 'mortality90d' | 'mortality1yr' | 'alerts' | 'topRiskFactor';
+type SortField = 'id' | 'name' | 'mortality30d' | 'mortality90d' | 'mortality1yr' | 'alerts' | 'topRiskFactor' | 'facility' | 'accessType';
 type SortDirection = 'asc' | 'desc';
-type FilterType = 'all' | 'high-risk' | 'alerts' | 'labs-due' | 'access-issues';
+type FilterType = 'all' | 'high-risk' | 'alerts' | 'access-issues';
 
 interface FilterState {
   facilities: string[];
@@ -47,23 +46,21 @@ export const Cockpit: React.FC = () => {
     facilities: [],
     accessTypes: [],
     minMortality: 0,
-    topN: 50,
+    topN: 6,
   });
 
-  const filteredPatients = useMemo(() => {
+  // Filter for patient table (only facility, access type, and quick filters)
+  const tablePatients = useMemo(() => {
     let filtered = [...mockPatients];
     
     // Apply facility filters
     if (facilityFilters.facilities.length > 0) {
-      filtered = filtered.filter(() => true); // Mock filter - would filter by actual facility
+      filtered = filtered.filter(p => facilityFilters.facilities.includes(p.facility));
     }
     
+    // Apply access type filters
     if (facilityFilters.accessTypes.length > 0) {
-      filtered = filtered.filter(() => true); // Mock filter - would filter by access type
-    }
-    
-    if (facilityFilters.minMortality > 0) {
-      filtered = filtered.filter(p => p.mortalityRisk['90d'] >= facilityFilters.minMortality);
+      filtered = filtered.filter(p => facilityFilters.accessTypes.includes(p.accessType));
     }
     
     // Apply quick filters
@@ -74,11 +71,8 @@ export const Cockpit: React.FC = () => {
       case 'alerts':
         filtered = filtered.filter(p => p.alerts.length > 0);
         break;
-      case 'labs-due':
-        filtered = filtered.filter(p => p.alerts.some(a => a.type.includes('Labs')));
-        break;
       case 'access-issues':
-        filtered = filtered.filter(p => p.topRiskFactor.includes('Access'));
+        filtered = filtered.filter(p => p.topRiskFactor.includes('Access') || p.accessType === 'CVC');
         break;
     }
 
@@ -116,6 +110,14 @@ export const Cockpit: React.FC = () => {
           aVal = a.topRiskFactor;
           bVal = b.topRiskFactor;
           break;
+        case 'facility':
+          aVal = a.facility;
+          bVal = b.facility;
+          break;
+        case 'accessType':
+          aVal = a.accessType;
+          bVal = b.accessType;
+          break;
         default:
           return 0;
       }
@@ -125,9 +127,21 @@ export const Cockpit: React.FC = () => {
       return 0;
     });
 
-    // Apply top N limit
+    return filtered;
+  }, [sortField, sortDirection, activeFilter, facilityFilters.facilities, facilityFilters.accessTypes]);
+
+  // Filter for graph (table filters + Top N + Mortality threshold)
+  const graphPatients = useMemo(() => {
+    let filtered = [...tablePatients];
+    
+    // Apply mortality threshold (graph only)
+    if (facilityFilters.minMortality > 0) {
+      filtered = filtered.filter(p => p.mortalityRisk['90d'] >= facilityFilters.minMortality);
+    }
+    
+    // Apply top N limit (graph only)
     return filtered.slice(0, facilityFilters.topN);
-  }, [sortField, sortDirection, activeFilter, facilityFilters]);
+  }, [tablePatients, facilityFilters.minMortality, facilityFilters.topN]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -151,13 +165,20 @@ export const Cockpit: React.FC = () => {
     all: mockPatients.length,
     'high-risk': mockPatients.filter(p => p.riskLevel === 'High').length,
     'alerts': mockPatients.filter(p => p.alerts.length > 0).length,
-    'labs-due': mockPatients.filter(p => p.alerts.some(a => a.type.includes('Labs'))).length,
-    'access-issues': mockPatients.filter(p => p.topRiskFactor.includes('Access')).length,
+    'access-issues': mockPatients.filter(p => p.topRiskFactor.includes('Access') || p.accessType === 'CVC').length,
   };
 
   return (
     <div className="min-h-screen bg-renal-bg">
-      <Header facilityName="RenalSim Dashboard" lastUpdated="2 minutes ago" />
+      {/* Dialysis CoPilot Header */}
+      <div className="bg-gradient-to-r from-renal-panel to-renal-panel-secondary border-b border-renal-border">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div>
+            <h1 className="text-2xl font-bold text-renal-text">Dialysis CoPilot</h1>
+            <p className="text-sm text-renal-muted mt-1">HD Command Center | In-Center Hemodialysis</p>
+          </div>
+        </div>
+      </div>
       
       <main className="p-6">
         {/* Summary KPIs */}
@@ -186,137 +207,166 @@ export const Cockpit: React.FC = () => {
           />
         </div>
 
-        {/* Facility Filter and Risk Mix Graph - 50/50 Split */}
+        {/* Facility Filters and Risk Mix Graph - Side by Side (Swapped) */}
         <div className="grid grid-cols-2 gap-6 mb-6">
-          {/* Facility Filters - Left 50% */}
+          {/* Facility Filters - Left */}
           <div className="min-w-0">
             <FacilityFilterSection onFilterChange={setFacilityFilters} />
           </div>
           
-          {/* Risk Mix Graph - Right 50% */}
+          {/* Risk Mix Graph - Right */}
           <div className="min-w-0">
-            <RiskMixGraph patients={mockPatients} />
+            <RiskMixGraph patients={graphPatients} />
           </div>
         </div>
 
-        <div className="flex gap-6">
-          {/* Quick Filter Panel */}
-          <div className="w-72 flex-shrink-0">
-            <Card>
-              <h3 className="text-sm font-semibold text-renal-text mb-4">Quick Filters</h3>
-              
-              <div className="space-y-2">
-                {[
-                  { id: 'all', label: 'All Patients' },
-                  { id: 'high-risk', label: 'High-risk only' },
-                  { id: 'alerts', label: 'With alerts' },
-                  { id: 'labs-due', label: 'Due for labs' },
-                  { id: 'access-issues', label: 'Access issues' },
-                ].map((filter) => (
-                  <button
-                    key={filter.id}
-                    onClick={() => setActiveFilter(filter.id as FilterType)}
-                    className={cn(
-                      'w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors',
-                      activeFilter === filter.id
-                        ? 'bg-rs-blue/20 text-rs-blue'
-                        : 'text-renal-muted hover:bg-white/5'
-                    )}
-                  >
-                    <span>{filter.label}</span>
-                    <span className="text-xs bg-renal-bg px-2 py-0.5 rounded-full">
-                      {filterCounts[filter.id as FilterType]}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </Card>
-          </div>
-
-          {/* Patient Table */}
-          <Card className="flex-1 p-0 overflow-hidden">
-            <div className="p-4 border-b border-renal-border">
-              <h2 className="text-lg font-semibold text-renal-text">Patient Cohort</h2>
-              <p className="text-sm text-renal-muted mt-1">
-                Showing {filteredPatients.length} of {mockPatients.length} patients
-              </p>
-            </div>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-renal-border">
-                    {[
-                      { field: 'id' as SortField, label: 'Patient ID', width: '100px' },
-                      { field: 'name' as SortField, label: 'Name', width: '180px' },
-                      { field: 'mortality30d' as SortField, label: '30d Mortality', width: '110px' },
-                      { field: 'mortality90d' as SortField, label: '90d Mortality', width: '110px' },
-                      { field: 'mortality1yr' as SortField, label: '1yr Mortality', width: '110px' },
-                      { field: 'alerts' as SortField, label: 'Alerts', width: '80px' },
-                      { field: 'topRiskFactor' as SortField, label: 'Top Risk Factor', width: '180px' },
-                    ].map((col) => (
-                      <th
-                        key={col.field + col.label}
-                        className="text-left px-4 py-3 text-xs font-bold text-renal-muted uppercase tracking-wider cursor-pointer hover:bg-white/5 transition-colors"
-                        style={{ width: col.width }}
-                        onClick={() => handleSort(col.field)}
-                      >
-                        <div className="flex items-center gap-1">
-                          {col.label}
-                          <SortIcon field={col.field} />
-                        </div>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredPatients.map((patient) => (
-                    <tr
-                      key={patient.id}
-                      className="border-b border-renal-border/50 hover:bg-white/5 cursor-pointer transition-colors"
-                      onClick={() => navigate(`/patient/${patient.id}`)}
-                    >
-                      <td className="px-4 py-3 font-mono text-sm text-renal-text">{patient.id}</td>
-                      <td className="px-4 py-3 text-sm text-renal-text font-medium">{patient.name}</td>
-                      <td className={cn('px-4 py-3 font-mono text-sm', getRiskColor(patient.mortalityRisk['30d']))}>
-                        {patient.mortalityRisk['30d'].toFixed(1)}%
-                      </td>
-                      <td className={cn('px-4 py-3 font-mono text-sm', getRiskColor(patient.mortalityRisk['90d']))}>
-                        {patient.mortalityRisk['90d'].toFixed(1)}%
-                      </td>
-                      <td className={cn('px-4 py-3 font-mono text-sm', getRiskColor(patient.mortalityRisk['1yr']))}>
-                        {patient.mortalityRisk['1yr'].toFixed(1)}%
-                      </td>
-                      <td className="px-4 py-3">
-                        {patient.alerts.length > 0 && (
-                          <div className="flex items-center gap-1">
-                            {getAlertIcon(patient.alerts[0].severity)}
-                            <span className="text-sm font-bold text-renal-text">
-                              {patient.alerts.length}
-                            </span>
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-renal-muted">{patient.topRiskFactor}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            
-            {filteredPatients.length === 0 && (
-              <div className="p-12 text-center">
-                <p className="text-renal-muted">No patients match the selected filters</p>
+        {/* Quick Filter Buttons - Above Patient List */}
+        <Card className="mb-6">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-semibold text-renal-text whitespace-nowrap">Quick Filters:</span>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { id: 'all', label: 'All Patients' },
+                { id: 'high-risk', label: 'High-risk only' },
+                { id: 'alerts', label: 'With alerts' },
+                { id: 'access-issues', label: 'Access issues' },
+              ].map((filter) => (
                 <button
-                  onClick={() => setActiveFilter('all')}
-                  className="mt-2 text-rs-blue hover:underline text-sm"
+                  key={filter.id}
+                  onClick={() => setActiveFilter(filter.id as FilterType)}
+                  className={cn(
+                    'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors',
+                    activeFilter === filter.id
+                      ? 'bg-rs-blue/20 text-rs-blue border border-rs-blue/30'
+                      : 'bg-renal-bg text-renal-muted border border-renal-border hover:text-renal-text'
+                  )}
                 >
-                  Clear all filters
+                  <span>{filter.label}</span>
+                  <span className="text-xs bg-renal-panel px-1.5 py-0.5 rounded-full">
+                    {filterCounts[filter.id as FilterType]}
+                  </span>
                 </button>
-              </div>
-            )}
-          </Card>
-        </div>
+              ))}
+              
+              {/* Active Facility/Access Filters - Inline */}
+              {facilityFilters.facilities.map(f => (
+                <span key={f} className="text-xs px-2 py-1.5 bg-rs-blue/20 text-rs-blue rounded-lg border border-rs-blue/30 flex items-center">
+                  {f}
+                </span>
+              ))}
+              {facilityFilters.accessTypes.map(t => (
+                <span key={t} className="text-xs px-2 py-1.5 bg-rs-green/20 text-rs-green rounded-lg border border-rs-green/30 flex items-center">
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+        </Card>
+
+        {/* Patient Table - Below Filters */}
+        <Card className="p-0 overflow-hidden">
+          <div className="p-4 border-b border-renal-border">
+            <h2 className="text-lg font-semibold text-renal-text">Patient Cohort</h2>
+            <p className="text-sm text-renal-muted mt-1">
+              Showing {tablePatients.length} of {mockPatients.length} patients
+            </p>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-renal-border">
+                  {[
+                    { field: 'id' as SortField, label: 'Patient ID', width: '110px' },
+                    { field: 'name' as SortField, label: 'Name', width: '150px' },
+                    { field: 'facility' as SortField, label: 'Center', width: '90px' },
+                    { field: 'accessType' as SortField, label: 'Access', width: '70px' },
+                    { field: 'mortality90d' as SortField, label: '90d Risk', width: '85px' },
+                    { field: 'mortality1yr' as SortField, label: '1yr Risk', width: '85px' },
+                    { field: 'alerts' as SortField, label: 'Alerts', width: '70px' },
+                    { field: 'topRiskFactor' as SortField, label: 'Archetype / Risk', width: '200px' },
+                  ].map((col) => (
+                    <th
+                      key={col.field}
+                      className="text-left px-3 py-3 text-xs font-bold text-renal-muted uppercase tracking-wider cursor-pointer hover:bg-white/5 transition-colors"
+                      style={{ width: col.width }}
+                      onClick={() => handleSort(col.field)}
+                    >
+                      <div className="flex items-center gap-1">
+                        {col.label}
+                        <SortIcon field={col.field} />
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {tablePatients.map((patient) => (
+                  <tr
+                    key={patient.id}
+                    className="border-b border-renal-border/50 hover:bg-white/5 cursor-pointer transition-colors"
+                    onClick={() => navigate(`/patient/${patient.id}`)}
+                  >
+                    <td className="px-3 py-3 font-mono text-sm text-renal-text">{patient.id}</td>
+                    <td className="px-3 py-3 text-sm text-renal-text font-medium">{patient.name}</td>
+                    <td className="px-3 py-3 text-xs text-renal-muted">{patient.facility}</td>
+                    <td className="px-3 py-3">
+                      <span className={cn(
+                        'text-xs px-2 py-0.5 rounded-full font-medium',
+                        patient.accessType === 'AVF' ? 'bg-rs-green/20 text-rs-green' :
+                        patient.accessType === 'AVG' ? 'bg-rs-amber/20 text-rs-amber' :
+                        'bg-rs-red/20 text-rs-red'
+                      )}>
+                        {patient.accessType}
+                      </span>
+                    </td>
+                    <td className={cn('px-3 py-3 font-mono text-sm font-bold', getRiskColor(patient.mortalityRisk['90d']))}>
+                      {patient.mortalityRisk['90d'].toFixed(1)}%
+                    </td>
+                    <td className={cn('px-3 py-3 font-mono text-sm', getRiskColor(patient.mortalityRisk['1yr']))}>
+                      {patient.mortalityRisk['1yr'].toFixed(1)}%
+                    </td>
+                    <td className="px-3 py-3">
+                      {patient.alerts.length > 0 ? (
+                        <div className="flex items-center gap-1">
+                          {getAlertIcon(patient.alerts[0].severity)}
+                          <span className="text-sm font-bold text-renal-text">
+                            {patient.alerts.length}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-renal-muted">-</span>
+                      )}
+                    </td>
+                    <td className="px-3 py-3 text-sm text-renal-text">
+                      {patient.archetype}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          
+          {tablePatients.length === 0 && (
+            <div className="p-12 text-center">
+              <p className="text-renal-muted">No patients match the selected filters</p>
+              <button
+                onClick={() => {
+                  setActiveFilter('all');
+                  setFacilityFilters({
+                    facilities: [],
+                    accessTypes: [],
+                    minMortality: 0,
+                    topN: 6,
+                  });
+                }}
+                className="mt-2 text-rs-blue hover:underline text-sm"
+              >
+                Clear all filters
+              </button>
+            </div>
+          )}
+        </Card>
       </main>
     </div>
   );

@@ -1,8 +1,8 @@
 import React from 'react';
-import { CheckCircle, Clock, AlertTriangle, Calendar, Link2 } from 'lucide-react';
+import { CheckCircle, Clock, AlertTriangle, Link2 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { mockClinicalEvents, mockTasks, mockCarePlan } from '../../data/mockData';
+import { mockTasks } from '../../data/mockData';
 import { cn } from '../../utils/cn';
 import type { Task } from '../../types';
 
@@ -40,102 +40,85 @@ export const EventsTasksTab: React.FC<EventsTasksTabProps> = ({ patient }) => {
   
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Active Tasks */}
-        <Card>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-renal-text">Active Tasks</h3>
-            <Button variant="primary" size="sm">
-              + New Task
-            </Button>
-          </div>
+      {/* Active Tasks - Full Width */}
+      <Card>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-renal-text">Active Tasks</h3>
+          <Button variant="primary" size="sm">
+            + New Task
+          </Button>
+        </div>
 
-          <div className="space-y-3">
-            {mockTasks.map((task) => (
-              <div
-                key={task.id}
-                className="flex items-start gap-3 p-3 bg-renal-bg rounded-lg border border-renal-border"
-              >
+        <div className="space-y-3">
+          {mockTasks.map((task) => (
+            <div
+              key={task.id}
+              className="flex items-start gap-4 p-4 bg-renal-bg rounded-lg border border-renal-border hover:border-rs-blue/50 transition-colors"
+            >
+              <div className="flex-shrink-0 mt-0.5">
                 {getStatusIcon(task.status)}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2">
-                    <h4 className="text-sm font-medium text-renal-text truncate">{task.description}</h4>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h4 className="text-sm font-semibold text-renal-text">{task.description}</h4>
+                    <p className="text-xs text-renal-muted mt-1">
+                      Task #{task.id} • Created {new Date(task.createdDate).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 flex-shrink-0">
                     <span className={cn(
-                      'px-2 py-0.5 rounded-full text-xs font-medium border flex-shrink-0',
+                      'px-2 py-1 rounded-full text-xs font-medium border',
                       getPriorityColor(task.priority)
                     )}>
                       {task.priority}
                     </span>
-                  </div>
-                  <div className="flex items-center gap-4 mt-1 text-xs text-renal-muted">
-                    <span>Assigned: {task.assignedTo}</span>
                     <span className={cn(
-                      new Date(task.dueDate) < new Date() ? 'text-rs-red' : ''
+                      'px-2 py-1 rounded-full text-xs font-medium border',
+                      task.status === 'Complete' ? 'bg-rs-green/20 text-rs-green border-rs-green/30' :
+                      task.status === 'In Progress' ? 'bg-rs-blue/20 text-rs-blue border-rs-blue/30' :
+                      'bg-renal-border text-renal-muted border-renal-border'
                     )}>
-                      Due: {new Date(task.dueDate).toLocaleDateString()}
+                      {task.status}
                     </span>
                   </div>
                 </div>
+                <div className="flex items-center gap-6 mt-3 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="text-renal-muted">Assigned to:</span>
+                    <span className="font-medium text-renal-text">{task.assignedTo}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-renal-muted">Due date:</span>
+                    <span className={cn(
+                      'font-medium',
+                      new Date(task.dueDate) < new Date() ? 'text-rs-red' : 'text-renal-text'
+                    )}>
+                      {new Date(task.dueDate).toLocaleDateString()}
+                    </span>
+                    {new Date(task.dueDate) < new Date() && (
+                      <span className="text-xs text-rs-red">(Overdue)</span>
+                    )}
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
-
-          <div className="mt-4 pt-4 border-t border-renal-border">
-            <div className="flex items-center gap-2 text-xs text-renal-muted">
-              <AlertTriangle className="w-4 h-4 text-rs-red" />
-              <span>2 tasks overdue</span>
+              <Button variant="ghost" size="sm" className="flex-shrink-0">
+                View
+              </Button>
             </div>
+          ))}
+        </div>
+
+        <div className="mt-4 pt-4 border-t border-renal-border flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs text-renal-muted">
+            <AlertTriangle className="w-4 h-4 text-rs-red" />
+            <span>2 tasks overdue</span>
           </div>
-        </Card>
-
-        {/* Care Plan */}
-        <Card>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-renal-text">Current Care Plan</h3>
-            <Button variant="secondary" size="sm">
-              Edit Plan
-            </Button>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <h4 className="text-xs font-medium text-renal-muted uppercase tracking-wider mb-2">Active Problems</h4>
-              <ul className="space-y-1">
-                {mockCarePlan.activeProblems.map((problem, idx) => (
-                  <li key={idx} className="flex items-center gap-2 text-sm text-renal-text">
-                    <div className="w-1.5 h-1.5 rounded-full bg-rs-red" />
-                    {problem}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-xs font-medium text-renal-muted uppercase tracking-wider mb-2">Goals of Care</h4>
-              <ul className="space-y-1">
-                {mockCarePlan.goals.map((goal, idx) => (
-                  <li key={idx} className="flex items-center gap-2 text-sm text-renal-text">
-                    <div className="w-1.5 h-1.5 rounded-full bg-rs-green" />
-                    {goal}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="text-xs font-medium text-renal-muted uppercase tracking-wider mb-2">Upcoming Procedures</h4>
-              <ul className="space-y-1">
-                {mockCarePlan.upcomingProcedures.map((proc, idx) => (
-                  <li key={idx} className="flex items-center gap-2 text-sm text-renal-text">
-                    <Calendar className="w-3.5 h-3.5 text-rs-blue" />
-                    {proc}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </Card>
-      </div>
+          <Button variant="secondary" size="sm">
+            View All Tasks
+          </Button>
+        </div>
+      </Card>
 
       {/* Clinical Events Timeline */}
       <Card>
@@ -211,40 +194,6 @@ export const EventsTasksTab: React.FC<EventsTasksTabProps> = ({ patient }) => {
           </div>
         </div>
 
-        {/* Detailed Event Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-renal-border">
-                <th className="text-left px-4 py-3 text-xs font-bold text-renal-muted uppercase">Date</th>
-                <th className="text-left px-4 py-3 text-xs font-bold text-renal-muted uppercase">Type</th>
-                <th className="text-left px-4 py-3 text-xs font-bold text-renal-muted uppercase">Description</th>
-                <th className="text-left px-4 py-3 text-xs font-bold text-renal-muted uppercase">Severity</th>
-                <th className="text-left px-4 py-3 text-xs font-bold text-renal-muted uppercase">Outcome</th>
-              </tr>
-            </thead>
-            <tbody>
-              {mockClinicalEvents.map((event) => (
-                <tr key={event.id} className="border-b border-renal-border/50 hover:bg-white/5">
-                  <td className="px-4 py-3 text-sm text-renal-text">{event.date}</td>
-                  <td className="px-4 py-3 text-sm text-renal-text">{event.type}</td>
-                  <td className="px-4 py-3 text-sm text-renal-text">{event.description}</td>
-                  <td className="px-4 py-3">
-                    <span className={cn(
-                      'px-2 py-1 rounded-full text-xs font-medium',
-                      event.severity === 'High' ? 'bg-rs-red/20 text-rs-red' :
-                      event.severity === 'Moderate' ? 'bg-rs-amber/20 text-rs-amber' :
-                      'bg-rs-blue/20 text-rs-blue'
-                    )}>
-                      {event.severity}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-renal-text">{event.outcome}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
       </Card>
     </div>
   );

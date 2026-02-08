@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { PatientHeader } from '../components/layout/PatientHeader';
-import { CopilotLevers } from '../components/layout/CopilotLevers';
+import { CopilotLevers, type LeverState, type MediatorScores } from '../components/layout/CopilotLevers';
+
 import { TabNavigation } from '../components/layout/TabNavigation';
 import { OverviewTab } from './tabs/OverviewTab';
+import { VolumeBPTab } from './tabs/VolumeBPTab';
 import { SessionDataTab } from './tabs/SessionDataTab';
 import { AdequacyTab } from './tabs/AdequacyTab';
 import { AccessTab } from './tabs/AccessTab';
@@ -17,8 +19,13 @@ import type { TabType } from '../types';
 export const PatientView: React.FC = () => {
   const { patientId } = useParams<{ patientId: string }>();
   const [activeTab, setActiveTab] = useState<TabType>('overview');
+  const [mediators, setMediators] = useState<MediatorScores | null>(null);
 
   const patient = mockPatients.find(p => p.id === patientId);
+
+  const handleLeversChange = (_levers: LeverState, newMediators: MediatorScores) => {
+    setMediators(newMediators);
+  };
 
   if (!patient) {
     return (
@@ -34,7 +41,9 @@ export const PatientView: React.FC = () => {
   const renderTab = () => {
     switch (activeTab) {
       case 'overview':
-        return <OverviewTab patient={patient} />;
+        return <OverviewTab patient={patient} mediators={mediators} />;
+      case 'volume':
+        return <VolumeBPTab patient={patient} />;
       case 'session':
         return <SessionDataTab patient={patient} />;
       case 'adequacy':
@@ -58,8 +67,8 @@ export const PatientView: React.FC = () => {
       <PatientHeader patient={patient} />
       
       {/* Copilot Levers - positioned below patient details */}
-      <CopilotLevers patient={patient} />
-      
+      <CopilotLevers patient={patient} onLeversChange={handleLeversChange} />
+
       <div className="bg-renal-panel border-b border-renal-border">
         <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
