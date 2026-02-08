@@ -60,7 +60,7 @@ export const VolumeBPTab: React.FC<VolumeBPTabProps> = ({ patient }) => {
 
       {/* SBP Chart with Metrics */}
       <Card>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Chart */}
           <div className="lg:col-span-2">
             <div className="h-80">

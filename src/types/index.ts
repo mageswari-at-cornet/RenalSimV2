@@ -161,3 +161,16 @@ export interface CausalPathway {
 }
 
 export type TabType = 'overview' | 'volume' | 'session' | 'adequacy' | 'access' | 'labs' | 'events' | 'quality';
+
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+}
+
+export interface SuggestedPrompt {
+  id: string;
+  text: string;
+  category: string;
+}

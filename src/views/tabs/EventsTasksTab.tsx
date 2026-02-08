@@ -153,7 +153,7 @@ export const EventsTasksTab: React.FC<EventsTasksTabProps> = ({ patient }) => {
         </div>
 
         {/* Event Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="p-3 bg-rs-red/10 border border-rs-red/30 rounded-lg">
             <div className="text-xs text-rs-red font-medium mb-1">Jan 5, 2024</div>
             <div className="text-sm font-medium text-renal-text">Hospitalization</div>

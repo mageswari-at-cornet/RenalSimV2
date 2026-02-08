@@ -25,7 +25,7 @@ export const AccessTab: React.FC<AccessTabProps> = ({ patient }) => {
   return (
     <div className="space-y-6">
       {/* Access Info and Risk Score */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="lg:col-span-2">
           <h3 className="text-sm font-semibold text-renal-text mb-4">Access Details</h3>
           <div className="grid grid-cols-2 gap-4">

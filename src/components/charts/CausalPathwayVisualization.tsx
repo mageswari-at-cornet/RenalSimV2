@@ -21,9 +21,10 @@ interface CausalPathway {
 
 interface CausalPathwayVisualizationProps {
   patient: Patient;
+  isChatOpen?: boolean;
 }
 
-export const CausalPathwayVisualization: React.FC<CausalPathwayVisualizationProps> = () => {
+export const CausalPathwayVisualization: React.FC<CausalPathwayVisualizationProps> = ({ isChatOpen }) => {
   const [selectedPathway, setSelectedPathway] = useState<string>('hemodynamic');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -144,39 +145,76 @@ export const CausalPathwayVisualization: React.FC<CausalPathwayVisualizationProp
       <div className="w-full">
         <h4 className="text-sm font-semibold text-renal-text mb-4">Active Causal Pathways</h4>
         
-        {/* Steps Flow - Full Width */}
-        <div className="flex items-center justify-center">
-          {currentPathway.steps.map((step, index) => (
-            <React.Fragment key={step.id}>
-              <div className="flex flex-col items-center" style={{ width: '120px' }}>
-                <div 
-                  className="w-16 h-16 rounded-full flex items-center justify-center relative"
-                  style={{ 
-                    background: `conic-gradient(${step.color} ${step.activation * 3.6}deg, #1e2a3a ${step.activation * 3.6}deg)`,
-                  }}
-                >
-                  <div className="w-12 h-12 rounded-full bg-renal-panel flex items-center justify-center">
-                    <span className="text-xs font-bold text-renal-text">{step.activation}%</span>
+        {/* Steps Flow - Normal: no scroll, Chat: scrollable */}
+        {isChatOpen ? (
+          <div className="overflow-x-auto pb-2">
+            <div className="flex items-center justify-center min-w-max">
+              {currentPathway.steps.map((step, index) => (
+                <React.Fragment key={step.id}>
+                  <div className="flex flex-col items-center flex-shrink-0" style={{ width: '120px' }}>
+                    <div 
+                      className="w-16 h-16 rounded-full flex items-center justify-center relative"
+                      style={{ 
+                        background: `conic-gradient(${step.color} ${step.activation * 3.6}deg, #1e2a3a ${step.activation * 3.6}deg)`,
+                      }}
+                    >
+                      <div className="w-12 h-12 rounded-full bg-renal-panel flex items-center justify-center">
+                        <span className="text-xs font-bold text-renal-text">{step.activation}%</span>
+                      </div>
+                    </div>
+                    <span className="text-xs text-renal-muted mt-2 text-center px-2" style={{ lineHeight: '1.2' }}>{step.label}</span>
                   </div>
+                  
+                  {index < currentPathway.steps.length - 1 && (
+                    <div className="flex items-center justify-center flex-shrink-0" style={{ width: '60px' }}>
+                      <svg width="48" height="20" className="text-renal-muted">
+                        <defs>
+                          <marker id={`arrowhead-${index}`} markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
+                            <polygon points="0 0, 6 2, 0 4" fill="#9aa8bb" />
+                          </marker>
+                        </defs>
+                        <line x1="0" y1="10" x2="42" y2="10" stroke="#9aa8bb" strokeWidth="1.5" markerEnd={`url(#arrowhead-${index})`} />
+                      </svg>
+                    </div>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center">
+            {currentPathway.steps.map((step, index) => (
+              <React.Fragment key={step.id}>
+                <div className="flex flex-col items-center" style={{ width: '120px' }}>
+                  <div 
+                    className="w-16 h-16 rounded-full flex items-center justify-center relative"
+                    style={{ 
+                      background: `conic-gradient(${step.color} ${step.activation * 3.6}deg, #1e2a3a ${step.activation * 3.6}deg)`,
+                    }}
+                  >
+                    <div className="w-12 h-12 rounded-full bg-renal-panel flex items-center justify-center">
+                      <span className="text-xs font-bold text-renal-text">{step.activation}%</span>
+                    </div>
+                  </div>
+                  <span className="text-xs text-renal-muted mt-2 text-center" style={{ maxWidth: '100px', lineHeight: '1.2' }}>{step.label}</span>
                 </div>
-                <span className="text-xs text-renal-muted mt-2 text-center" style={{ maxWidth: '100px', lineHeight: '1.2' }}>{step.label}</span>
-              </div>
-              
-              {index < currentPathway.steps.length - 1 && (
-                <div className="flex items-center justify-center px-2" style={{ width: '60px' }}>
-                  <svg width="48" height="20" className="text-renal-muted">
-                    <defs>
-                      <marker id={`arrowhead-${index}`} markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
-                        <polygon points="0 0, 6 2, 0 4" fill="#9aa8bb" />
-                      </marker>
-                    </defs>
-                    <line x1="0" y1="10" x2="42" y2="10" stroke="#9aa8bb" strokeWidth="1.5" markerEnd={`url(#arrowhead-${index})`} />
-                  </svg>
-                </div>
-              )}
-            </React.Fragment>
-          ))}
-        </div>
+                
+                {index < currentPathway.steps.length - 1 && (
+                  <div className="flex items-center justify-center px-2" style={{ width: '60px' }}>
+                    <svg width="48" height="20" className="text-renal-muted">
+                      <defs>
+                        <marker id={`arrowhead-${index}`} markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto">
+                          <polygon points="0 0, 6 2, 0 4" fill="#9aa8bb" />
+                        </marker>
+                      </defs>
+                      <line x1="0" y1="10" x2="42" y2="10" stroke="#9aa8bb" strokeWidth="1.5" markerEnd={`url(#arrowhead-${index})`} />
+                    </svg>
+                  </div>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Mechanism of Failure Panel - Moved to bottom */}

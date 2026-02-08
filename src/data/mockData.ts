@@ -4,7 +4,7 @@ import type { Patient, SessionData, LabResult, Medication, AccessInfo, AccessMet
 export const mockPatients: Patient[] = [
   {
     id: 'HD-1074',
-    name: 'Rajesh Kumar',
+    name: 'James Thompson',
     age: 68,
     sex: 'Male',
     dialysisVintage: 52,
@@ -28,7 +28,7 @@ export const mockPatients: Patient[] = [
   },
   {
     id: 'HD-1077',
-    name: 'Sita Devi',
+    name: 'Mary Johnson',
     age: 54,
     sex: 'Female',
     dialysisVintage: 18,
@@ -51,7 +51,7 @@ export const mockPatients: Patient[] = [
   },
   {
     id: 'HD-1011',
-    name: 'Ram Prasad',
+    name: 'Robert Smith',
     age: 61,
     sex: 'Male',
     dialysisVintage: 28,
@@ -75,7 +75,7 @@ export const mockPatients: Patient[] = [
   },
   {
     id: 'HD-1024',
-    name: 'Vikram Mehta',
+    name: 'Michael Davis',
     age: 72,
     sex: 'Male',
     dialysisVintage: 44,
@@ -99,7 +99,7 @@ export const mockPatients: Patient[] = [
   },
   {
     id: 'HD-1058',
-    name: 'Anita Sharma',
+    name: 'Sarah Wilson',
     age: 58,
     sex: 'Female',
     dialysisVintage: 36,
@@ -122,7 +122,7 @@ export const mockPatients: Patient[] = [
   },
   {
     id: 'HD-1003',
-    name: 'Priya Patel',
+    name: 'Jennifer Brown',
     age: 52,
     sex: 'Female',
     dialysisVintage: 24,

@@ -14,6 +14,7 @@ import type { MediatorScores } from '../../components/layout/CopilotLevers';
 interface OverviewTabProps {
   patient: Patient;
   mediators?: MediatorScores | null;
+  isChatOpen?: boolean;
 }
 
 // Calculate mortality reduction based on mediator changes
@@ -39,7 +40,7 @@ const calculateMortalityDelta = (
   };
 };
 
-export const OverviewTab: React.FC<OverviewTabProps> = ({ patient, mediators }) => {
+export const OverviewTab: React.FC<OverviewTabProps> = ({ patient, mediators, isChatOpen }) => {
   const sparklineData = generateSparklineData(12);
   
   // Calculate new mortality risks based on mediators
@@ -58,7 +59,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ patient, mediators }) 
 
   return (
     <div className="space-y-6">
-      {/* Risk KPIs with Delta Changes - 4 columns including Hospitalization */}
+      {/* Risk KPIs with Delta Changes - responsive columns */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* 30d Hospitalization */}
         <KPICard
@@ -67,8 +68,8 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ patient, mediators }) 
           subtitle={patient.hospitalizationRisk['30d'] > 20 ? 'High Risk' : patient.hospitalizationRisk['30d'] > 10 ? 'Medium Risk' : 'Low Risk'}
           status={patient.hospitalizationRisk['30d'] > 20 ? 'critical' : patient.hospitalizationRisk['30d'] > 10 ? 'warning' : 'good'}
         >
-          <div className="mt-2">
-            <Sparkline data={sparklineData} width={200} height={40} color={patient.hospitalizationRisk['30d'] > 20 ? '#ff4d4f' : patient.hospitalizationRisk['30d'] > 10 ? '#ffb020' : '#23d18b'} />
+          <div className="mt-2 overflow-hidden">
+            <Sparkline data={sparklineData} width="100%" height={40} color={patient.hospitalizationRisk['30d'] > 20 ? '#ff4d4f' : patient.hospitalizationRisk['30d'] > 10 ? '#ffb020' : '#23d18b'} />
           </div>
           
           {/* Delta Change from Interventions */}
@@ -97,8 +98,8 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ patient, mediators }) 
           }}
           status={patient.mortalityRisk['30d'] > 20 ? 'critical' : patient.mortalityRisk['30d'] > 10 ? 'warning' : 'good'}
         >
-          <div className="mt-2">
-            <Sparkline data={sparklineData} width={200} height={40} color={patient.mortalityRisk['30d'] > 20 ? '#ff4d4f' : patient.mortalityRisk['30d'] > 10 ? '#ffb020' : '#23d18b'} />
+          <div className="mt-2 overflow-hidden">
+            <Sparkline data={sparklineData} width="100%" height={40} color={patient.mortalityRisk['30d'] > 20 ? '#ff4d4f' : patient.mortalityRisk['30d'] > 10 ? '#ffb020' : '#23d18b'} />
           </div>
           
           {/* Delta Change from Interventions */}
@@ -127,8 +128,8 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ patient, mediators }) 
           }}
           status={patient.mortalityRisk['90d'] > 20 ? 'critical' : patient.mortalityRisk['90d'] > 10 ? 'warning' : 'good'}
         >
-          <div className="mt-2">
-            <Sparkline data={sparklineData} width={200} height={40} color={patient.mortalityRisk['90d'] > 20 ? '#ff4d4f' : patient.mortalityRisk['90d'] > 10 ? '#ffb020' : '#23d18b'} />
+          <div className="mt-2 overflow-hidden">
+            <Sparkline data={sparklineData} width="100%" height={40} color={patient.mortalityRisk['90d'] > 20 ? '#ff4d4f' : patient.mortalityRisk['90d'] > 10 ? '#ffb020' : '#23d18b'} />
           </div>
           
           {/* Delta Change from Interventions */}
@@ -157,8 +158,8 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ patient, mediators }) 
           }}
           status={patient.mortalityRisk['1yr'] > 20 ? 'critical' : patient.mortalityRisk['1yr'] > 10 ? 'warning' : 'good'}
         >
-          <div className="mt-2">
-            <Sparkline data={sparklineData} width={200} height={40} color={patient.mortalityRisk['1yr'] > 20 ? '#ff4d4f' : patient.mortalityRisk['1yr'] > 10 ? '#ffb020' : '#23d18b'} />
+          <div className="mt-2 overflow-hidden">
+            <Sparkline data={sparklineData} width="100%" height={40} color={patient.mortalityRisk['1yr'] > 20 ? '#ff4d4f' : patient.mortalityRisk['1yr'] > 10 ? '#ffb020' : '#23d18b'} />
           </div>
           
           {/* Delta Change from Interventions */}
@@ -396,7 +397,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ patient, mediators }) 
 
         {/* Causal Pathway Visualization */}
         <div className="h-full">
-          <CausalPathwayVisualization patient={patient} />
+          <CausalPathwayVisualization patient={patient} isChatOpen={isChatOpen} />
         </div>
       </div>
     </div>

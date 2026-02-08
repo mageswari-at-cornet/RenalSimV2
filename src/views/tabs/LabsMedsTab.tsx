@@ -166,7 +166,7 @@ export const LabsMedsTab: React.FC<LabsMedsTabProps> = () => {
       </Card>
 
       {/* Lab Trend Charts - Row 1 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <h3 className="text-sm font-semibold text-renal-text mb-4">Hemoglobin Trend</h3>
           <div className="h-48">
@@ -199,7 +199,7 @@ export const LabsMedsTab: React.FC<LabsMedsTabProps> = () => {
       </div>
 
       {/* Lab Trend Charts - Row 2 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <h3 className="text-sm font-semibold text-renal-text mb-4">Potassium Trend</h3>
           <div className="h-48">
@@ -234,7 +234,7 @@ export const LabsMedsTab: React.FC<LabsMedsTabProps> = () => {
       </div>
 
       {/* Lab Trend Charts - Row 3 */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <h3 className="text-sm font-semibold text-renal-text mb-4">Calcium Trend</h3>
           <div className="h-48">
@@ -282,7 +282,7 @@ export const LabsMedsTab: React.FC<LabsMedsTabProps> = () => {
       </div>
 
       {/* Medications and Management Panels */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="lg:col-span-2">
           <h3 className="text-sm font-semibold text-renal-text mb-4">Current Medications</h3>
           <div className="space-y-4">
