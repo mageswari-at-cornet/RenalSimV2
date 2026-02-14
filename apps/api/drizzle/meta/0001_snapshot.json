@@ -1,0 +1,745 @@
+{
+  "id": "33ffcf51-a167-4e44-a41d-23d73128f339",
+  "prevId": "c50bf8cc-6611-4137-9bf8-61dbbd2caae9",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.access_metrics": {
+      "name": "access_metrics",
+      "schema": "",
+      "columns": {
+        "metric_id": {
+          "name": "metric_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "access_id": {
+          "name": "access_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "arterial_pressure": {
+          "name": "arterial_pressure",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "venous_pressure": {
+          "name": "venous_pressure",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "flow_rate": {
+          "name": "flow_rate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "recorded_date": {
+          "name": "recorded_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "access_metrics_access_id_vascular_access_access_id_fk": {
+          "name": "access_metrics_access_id_vascular_access_access_id_fk",
+          "tableFrom": "access_metrics",
+          "tableTo": "vascular_access",
+          "columnsFrom": [
+            "access_id"
+          ],
+          "columnsTo": [
+            "access_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dialysis_sessions": {
+      "name": "dialysis_sessions",
+      "schema": "",
+      "columns": {
+        "session_id": {
+          "name": "session_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "patient_id": {
+          "name": "patient_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "session_date": {
+          "name": "session_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start_time": {
+          "name": "start_time",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_time": {
+          "name": "end_time",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dialysis_technique": {
+          "name": "dialysis_technique",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dialyzer_type": {
+          "name": "dialyzer_type",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dialysate_bath_type": {
+          "name": "dialysate_bath_type",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dry_weight": {
+          "name": "dry_weight",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pre_dialysis_weight": {
+          "name": "pre_dialysis_weight",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "post_dialysis_weight": {
+          "name": "post_dialysis_weight",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "interdialytic_weight_gain": {
+          "name": "interdialytic_weight_gain",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dialysate_temperature": {
+          "name": "dialysate_temperature",
+          "type": "numeric(4, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "replacement_volume": {
+          "name": "replacement_volume",
+          "type": "numeric(6, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dialysis_dose_kt": {
+          "name": "dialysis_dose_kt",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "blood_flow_rate": {
+          "name": "blood_flow_rate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dialysate_flow_rate": {
+          "name": "dialysate_flow_rate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dialysate_conductivity": {
+          "name": "dialysate_conductivity",
+          "type": "numeric(4, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bicarbonate_conductivity": {
+          "name": "bicarbonate_conductivity",
+          "type": "numeric(4, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ultrafiltration_rate": {
+          "name": "ultrafiltration_rate",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "intradialytic_hypotension": {
+          "name": "intradialytic_hypotension",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_session_patient": {
+          "name": "idx_session_patient",
+          "columns": [
+            {
+              "expression": "patient_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "dialysis_sessions_patient_id_patients_patient_id_fk": {
+          "name": "dialysis_sessions_patient_id_patients_patient_id_fk",
+          "tableFrom": "dialysis_sessions",
+          "tableTo": "patients",
+          "columnsFrom": [
+            "patient_id"
+          ],
+          "columnsTo": [
+            "patient_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.lab_results": {
+      "name": "lab_results",
+      "schema": "",
+      "columns": {
+        "lab_id": {
+          "name": "lab_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "patient_id": {
+          "name": "patient_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "test_date": {
+          "name": "test_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hemoglobin": {
+          "name": "hemoglobin",
+          "type": "numeric(4, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "albumin": {
+          "name": "albumin",
+          "type": "numeric(4, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "potassium": {
+          "name": "potassium",
+          "type": "numeric(4, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sodium": {
+          "name": "sodium",
+          "type": "numeric(4, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "calcium": {
+          "name": "calcium",
+          "type": "numeric(4, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "phosphorus": {
+          "name": "phosphorus",
+          "type": "numeric(4, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "urea": {
+          "name": "urea",
+          "type": "numeric(6, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "creatinine": {
+          "name": "creatinine",
+          "type": "numeric(6, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bicarbonate": {
+          "name": "bicarbonate",
+          "type": "numeric(4, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ferritin": {
+          "name": "ferritin",
+          "type": "numeric(6, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_lab_patient": {
+          "name": "idx_lab_patient",
+          "columns": [
+            {
+              "expression": "patient_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "lab_results_patient_id_patients_patient_id_fk": {
+          "name": "lab_results_patient_id_patients_patient_id_fk",
+          "tableFrom": "lab_results",
+          "tableTo": "patients",
+          "columnsFrom": [
+            "patient_id"
+          ],
+          "columnsTo": [
+            "patient_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.medications": {
+      "name": "medications",
+      "schema": "",
+      "columns": {
+        "medication_id": {
+          "name": "medication_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "patient_id": {
+          "name": "patient_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "drug_name": {
+          "name": "drug_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dose": {
+          "name": "dose",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "frequency": {
+          "name": "frequency",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "route": {
+          "name": "route",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "active": {
+          "name": "active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "medications_patient_id_patients_patient_id_fk": {
+          "name": "medications_patient_id_patients_patient_id_fk",
+          "tableFrom": "medications",
+          "tableTo": "patients",
+          "columnsFrom": [
+            "patient_id"
+          ],
+          "columnsTo": [
+            "patient_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.patients": {
+      "name": "patients",
+      "schema": "",
+      "columns": {
+        "patient_id": {
+          "name": "patient_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "mrn": {
+          "name": "mrn",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "first_name": {
+          "name": "first_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sex": {
+          "name": "sex",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_of_birth": {
+          "name": "date_of_birth",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "phone": {
+          "name": "phone",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "risk_level": {
+          "name": "risk_level",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "active": {
+          "name": "active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "patients_mrn_unique": {
+          "name": "patients_mrn_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "mrn"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.session_vitals": {
+      "name": "session_vitals",
+      "schema": "",
+      "columns": {
+        "vital_id": {
+          "name": "vital_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "session_id": {
+          "name": "session_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "recorded_time": {
+          "name": "recorded_time",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "systolic_bp": {
+          "name": "systolic_bp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "diastolic_bp": {
+          "name": "diastolic_bp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "heart_rate": {
+          "name": "heart_rate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "body_temperature": {
+          "name": "body_temperature",
+          "type": "numeric(4, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "arterial_line_pressure": {
+          "name": "arterial_line_pressure",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "venous_line_pressure": {
+          "name": "venous_line_pressure",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "transmembrane_pressure": {
+          "name": "transmembrane_pressure",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_vitals_session": {
+          "name": "idx_vitals_session",
+          "columns": [
+            {
+              "expression": "session_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "session_vitals_session_id_dialysis_sessions_session_id_fk": {
+          "name": "session_vitals_session_id_dialysis_sessions_session_id_fk",
+          "tableFrom": "session_vitals",
+          "tableTo": "dialysis_sessions",
+          "columnsFrom": [
+            "session_id"
+          ],
+          "columnsTo": [
+            "session_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.vascular_access": {
+      "name": "vascular_access",
+      "schema": "",
+      "columns": {
+        "access_id": {
+          "name": "access_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "patient_id": {
+          "name": "patient_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "access_type": {
+          "name": "access_type",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "location": {
+          "name": "location",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_date": {
+          "name": "created_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "vascular_access_patient_id_patients_patient_id_fk": {
+          "name": "vascular_access_patient_id_patients_patient_id_fk",
+          "tableFrom": "vascular_access",
+          "tableTo": "patients",
+          "columnsFrom": [
+            "patient_id"
+          ],
+          "columnsTo": [
+            "patient_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

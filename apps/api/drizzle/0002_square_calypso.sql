@@ -1,0 +1,1 @@
+ALTER TABLE "lab_results" ALTER COLUMN "sodium" SET DATA TYPE numeric(5, 2);
