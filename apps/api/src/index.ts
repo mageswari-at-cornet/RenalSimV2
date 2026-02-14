@@ -1,4 +1,4 @@
-// Force reload trigger
+// Force reload trigger: 2
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import dotenv from 'dotenv';

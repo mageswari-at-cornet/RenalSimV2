@@ -322,9 +322,46 @@ export const PatientService = {
         };
         const riskScore = accessMetrics ? calculateAccessRisk(accessMetrics, vpSlope) : 25;
 
-        // Data Quality Calculation
+        // Data Quality Calculation — multi-dimensional
+        const totalSessions = Math.max(1, p.dialysisSessions.length);
+
+        // 1. Vitals presence: % of sessions that have at least one vital (weight 25%)
         const sessionsWithVitals = p.dialysisSessions.filter(s => s.sessionVitals.length > 0).length;
-        const dataQualityScore = Math.round((sessionsWithVitals / Math.max(1, p.dialysisSessions.length)) * 100);
+        const vitalPresenceScore = sessionsWithVitals / totalSessions;
+
+        // 2. Vitals field completeness: avg completeness of key vital fields per session (weight 25%)
+        const vitalFieldsCheck = p.dialysisSessions.map(s => {
+            const v = s.sessionVitals[0];
+            if (!v) return 0;
+            const fields = [v.systolicBp, v.diastolicBp, v.heartRate, v.bodyTemperature, v.arterialLinePressure, v.venousLinePressure, v.transmembranePressure];
+            return fields.filter(f => f != null && f !== 0).length / fields.length;
+        });
+        const vitalFieldScore = vitalFieldsCheck.reduce((a, b) => a + b, 0) / totalSessions;
+
+        // 3. Session field completeness: key fields like weights, BFR, UF rate (weight 20%)
+        const sessionFieldsCheck = p.dialysisSessions.map(s => {
+            const fields = [s.preDialysisWeight, s.postDialysisWeight, s.bloodFlowRate, s.ultrafiltrationRate, s.dialysisDoseKt];
+            return fields.filter(f => f != null && Number(f) !== 0).length / fields.length;
+        });
+        const sessionFieldScore = sessionFieldsCheck.reduce((a, b) => a + b, 0) / totalSessions;
+
+        // 4. Lab coverage: do we have recent labs? (weight 20%)
+        const labCount = p.labResults.length;
+        const labScore = Math.min(1, labCount / 6); // expect at least 6 lab records
+
+        // 5. Medication records: are meds populated? (weight 10%)
+        const medScore = (p.medications && p.medications.length > 0) ? 1 : 0;
+
+        const rawQuality = (
+            vitalPresenceScore * 0.25 +
+            vitalFieldScore * 0.25 +
+            sessionFieldScore * 0.20 +
+            labScore * 0.20 +
+            medScore * 0.10
+        ) * 100;
+
+        // Cap at 98 — never show a perfect 100
+        const dataQualityScore = Math.min(98, Math.round(rawQuality));
 
         // Risk Calculation (Duplicated from getAllPatients for now)
         const albumin = patientLatestLabs ? Number(patientLatestLabs.albumin) : 4.0;
