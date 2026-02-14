@@ -21,12 +21,12 @@ async function main() {
 
         // ---------- PATIENT DATA ----------
         const seedPatients = [
-            { mrn: 'HD-1074', firstName: 'James', lastName: 'Thompson', sex: 'Male', dob: '1957-01-01', diagnosis: 'Diabetic Nephropathy', vintage: 52, archetype: 'The Crasher (IDH/HF)', sessionKey: 'HD0101', schedule: { days: 3, mins: 240 } },
-            { mrn: 'HD-1077', firstName: 'Mary', lastName: 'Johnson', sex: 'Female', dob: '1971-01-01', diagnosis: 'Diabetic Nephropathy', vintage: 18, archetype: 'The Non-Adherent', sessionKey: 'HD0102', schedule: { days: 3, mins: 210 } },
-            { mrn: 'HD-1011', firstName: 'Robert', lastName: 'Smith', sex: 'Male', dob: '1964-01-01', diagnosis: 'Hypertensive Nephropathy', vintage: 28, archetype: 'Inflamed CVC', sessionKey: 'HD0103', schedule: { days: 3, mins: 240 } },
-            { mrn: 'HD-1024', firstName: 'Michael', lastName: 'Davis', sex: 'Male', dob: '1953-01-01', diagnosis: 'Diabetic Nephropathy', vintage: 44, archetype: 'The Clotter', sessionKey: 'HD0104', schedule: { days: 3, mins: 240 } },
-            { mrn: 'HD-1058', firstName: 'Sarah', lastName: 'Wilson', sex: 'Female', dob: '1967-01-01', diagnosis: 'Glomerulonephritis', vintage: 36, archetype: 'Malnourished/Inflamed', sessionKey: 'HD0105', schedule: { days: 3, mins: 240 } },
-            { mrn: 'HD-1003', firstName: 'Jennifer', lastName: 'Brown', sex: 'Female', dob: '1973-01-01', diagnosis: 'Polycystic Kidney Disease', vintage: 24, archetype: 'Stable', sessionKey: 'HD0106', schedule: { days: 3, mins: 240 } },
+            { mrn: 'HD-1074', firstName: 'James', lastName: 'Thompson', sex: 'Male', dob: '1957-01-01', diagnosis: 'Diabetic Nephropathy', vintage: 52, archetype: 'The Crasher (IDH/HF)', sessionKey: 'HD0101', schedule: { days: 3, mins: 240 }, center: 'Center A' },
+            { mrn: 'HD-1077', firstName: 'Mary', lastName: 'Johnson', sex: 'Female', dob: '1971-01-01', diagnosis: 'Diabetic Nephropathy', vintage: 18, archetype: 'The Non-Adherent', sessionKey: 'HD0102', schedule: { days: 3, mins: 210 }, center: 'Center B' },
+            { mrn: 'HD-1011', firstName: 'Robert', lastName: 'Smith', sex: 'Male', dob: '1964-01-01', diagnosis: 'Hypertensive Nephropathy', vintage: 28, archetype: 'Inflamed CVC', sessionKey: 'HD0103', schedule: { days: 3, mins: 240 }, center: 'Center C' },
+            { mrn: 'HD-1024', firstName: 'Michael', lastName: 'Davis', sex: 'Male', dob: '1953-01-01', diagnosis: 'Diabetic Nephropathy', vintage: 44, archetype: 'The Clotter', sessionKey: 'HD0104', schedule: { days: 3, mins: 240 }, center: 'Center A' },
+            { mrn: 'HD-1058', firstName: 'Sarah', lastName: 'Wilson', sex: 'Female', dob: '1967-01-01', diagnosis: 'Glomerulonephritis', vintage: 36, archetype: 'Malnourished/Inflamed', sessionKey: 'HD0105', schedule: { days: 3, mins: 240 }, center: 'Center B' },
+            { mrn: 'HD-1003', firstName: 'Jennifer', lastName: 'Brown', sex: 'Female', dob: '1973-01-01', diagnosis: 'Polycystic Kidney Disease', vintage: 24, archetype: 'Stable', sessionKey: 'HD0106', schedule: { days: 3, mins: 240 }, center: 'Center C' },
         ];
 
         // ---------- SESSION RAW DATA ----------
@@ -82,7 +82,8 @@ async function main() {
                 dialysisVintage: p.vintage,
                 scheduleDaysPerWeek: 3,
                 scheduleDurationMinutes: p.schedule.mins,
-                archetype: p.archetype
+                archetype: p.archetype,
+                center: p.center
             }).returning();
 
             const [access] = await db.insert(vascularAccess).values({

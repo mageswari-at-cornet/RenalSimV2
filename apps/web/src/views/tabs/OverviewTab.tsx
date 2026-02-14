@@ -116,11 +116,11 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ patient, mediators, ac
               </>
             ) : prediction ? (
               <>
-                <span>🤖</span> AI Analysis
+                Copilot Analysis
               </>
             ) : (
               <>
-                <span>⚡</span> Standard Rule-Based
+                <span>⚡</span> Standard
               </>
             )}
           </Badge>
@@ -130,8 +130,6 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ patient, mediators, ac
         <KPICard
           label="30-Day Hospitalization"
           value={`${patient.hospitalizationRisk['30d'].toFixed(1)}%`}
-          subtitle={patient.hospitalizationRisk['30d'] > 20 ? 'High Risk' : patient.hospitalizationRisk['30d'] > 10 ? 'Medium Risk' : 'Low Risk'}
-          status={patient.hospitalizationRisk['30d'] > 20 ? 'critical' : patient.hospitalizationRisk['30d'] > 10 ? 'warning' : 'good'}
         >
           <div className="mt-2 overflow-hidden">
             <Sparkline data={hospSparkData.length > 0 ? hospSparkData : [18, 22, 19, 21]} width="100%" height={40} color={patient.hospitalizationRisk['30d'] > 20 ? '#ff4d4f' : patient.hospitalizationRisk['30d'] > 10 ? '#ffb020' : '#23d18b'} />
@@ -169,12 +167,6 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ patient, mediators, ac
         <KPICard
           label="30-Day Mortality"
           value={`${patient.mortalityRisk['30d'].toFixed(1)}%`}
-          subtitle={patient.mortalityRisk['30d'] > 20 ? 'High Risk' : patient.mortalityRisk['30d'] > 10 ? 'Medium Risk' : 'Low Risk'}
-          delta={{
-            value: Math.abs(patient.mortalityDelta['30d']),
-            direction: patient.mortalityDelta['30d'] > 0 ? 'up' : 'down',
-          }}
-          status={patient.mortalityRisk['30d'] > 20 ? 'critical' : patient.mortalityRisk['30d'] > 10 ? 'warning' : 'good'}
         >
           <div className="mt-2 overflow-hidden">
             <Sparkline data={mortalitySparkData.length > 0 ? mortalitySparkData : [12, 11, 13, 12]} width="100%" height={40} color={patient.mortalityRisk['30d'] > 20 ? '#ff4d4f' : patient.mortalityRisk['30d'] > 10 ? '#ffb020' : '#23d18b'} />
@@ -207,12 +199,6 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ patient, mediators, ac
         <KPICard
           label="90-Day Mortality"
           value={`${patient.mortalityRisk['90d'].toFixed(1)}%`}
-          subtitle={patient.mortalityRisk['90d'] > 20 ? 'High Risk' : patient.mortalityRisk['90d'] > 10 ? 'Medium Risk' : 'Low Risk'}
-          delta={{
-            value: Math.abs(patient.mortalityDelta['90d']),
-            direction: patient.mortalityDelta['90d'] > 0 ? 'up' : 'down',
-          }}
-          status={patient.mortalityRisk['90d'] > 20 ? 'critical' : patient.mortalityRisk['90d'] > 10 ? 'warning' : 'good'}
         >
           <div className="mt-2 overflow-hidden">
             <Sparkline data={mortalitySparkData.length > 0 ? mortalitySparkData : [15, 14, 16, 15]} width="100%" height={40} color={patient.mortalityRisk['90d'] > 20 ? '#ff4d4f' : patient.mortalityRisk['90d'] > 10 ? '#ffb020' : '#23d18b'} />
@@ -245,12 +231,6 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({ patient, mediators, ac
         <KPICard
           label="1-Year Mortality"
           value={`${patient.mortalityRisk['1yr'].toFixed(1)}%`}
-          subtitle={patient.mortalityRisk['1yr'] > 20 ? 'High Risk' : patient.mortalityRisk['1yr'] > 10 ? 'Medium Risk' : 'Low Risk'}
-          delta={{
-            value: Math.abs(patient.mortalityDelta['1yr']),
-            direction: patient.mortalityDelta['1yr'] > 0 ? 'up' : 'down',
-          }}
-          status={patient.mortalityRisk['1yr'] > 20 ? 'critical' : patient.mortalityRisk['1yr'] > 10 ? 'warning' : 'good'}
         >
           <div className="mt-2 overflow-hidden">
             <Sparkline data={mortalitySparkData.length > 0 ? mortalitySparkData : [25, 24, 26, 25]} width="100%" height={40} color={patient.mortalityRisk['1yr'] > 20 ? '#ff4d4f' : patient.mortalityRisk['1yr'] > 10 ? '#ffb020' : '#23d18b'} />

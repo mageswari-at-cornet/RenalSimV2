@@ -262,114 +262,48 @@ export const LabsMedsTab: React.FC<LabsMedsTabProps> = ({ patient }) => {
         </Card>
       </div>
 
-      {/* Medications and Management Panels */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2">
-          <h3 className="text-sm font-semibold text-renal-text mb-4">Current Medications</h3>
-          <div className="space-y-4">
-            {medicationCategories.map((category) => {
-              const meds = (patient.medications || []).filter((m: Medication) => m.category === category.name);
-              if (meds.length === 0) return null;
+      {/* Medications */}
+      <Card>
+        <h3 className="text-sm font-semibold text-renal-text mb-4">Current Medications</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {medicationCategories.map((category) => {
+            const meds = (patient.medications || []).filter((m: Medication) => m.category === category.name);
+            if (meds.length === 0) return null;
 
-              return (
-                <div key={category.name}>
-                  <h4 className="text-xs font-medium mb-2" style={{ color: category.color }}>
-                    {category.name}
-                  </h4>
-                  <div className="grid grid-cols-1 gap-2">
-                    {meds.map((med: Medication, idx: number) => (
-                      <div key={idx} className="flex items-center justify-between p-2 bg-renal-bg rounded-lg">
-                        <div>
-                          <div className="text-sm font-medium text-renal-text">{med.name}</div>
-                          <div className="text-xs text-renal-muted">
-                            {med.dose} {med.frequency} • {med.route}
-                          </div>
-                        </div>
+            return (
+              <div key={category.name}>
+                <h4 className="text-xs font-medium mb-2" style={{ color: category.color }}>
+                  {category.name}
+                </h4>
+                <div className="space-y-2">
+                  {meds.map((med: Medication, idx: number) => (
+                    <div key={idx} className="flex items-center justify-between p-2 bg-renal-bg rounded-lg">
+                      <div>
+                        <div className="text-sm font-medium text-renal-text">{med.name}</div>
                         <div className="text-xs text-renal-muted">
-                          Started {med.startDate}
+                          {med.dose} {med.frequency} • {med.route}
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="mt-4 p-3 bg-rs-red/10 border border-rs-red/30 rounded-lg">
-            <div className="flex items-start gap-2">
-              <AlertTriangle className="w-4 h-4 text-rs-red flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-rs-red">
-                Alert: K+ 5.8 with ACEI/ARB prescribed - review medications
-              </p>
-            </div>
-          </div>
-        </Card>
-
-        <div className="space-y-6">
-          <Card>
-            <h3 className="text-sm font-semibold text-renal-text mb-4">Anemia Management</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-renal-muted">Current Hb</span>
-                <span className="text-lg font-bold text-rs-amber">9.8 g/dL</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-renal-muted">Target</span>
-                <span className="text-sm text-renal-text">10-11.5 g/dL</span>
-              </div>
-              <div className="h-px bg-renal-border" />
-              <div>
-                <div className="text-xs text-renal-muted mb-1">Current ESA</div>
-                <div className="text-sm text-renal-text">Epoetin 4000 units x3/week</div>
-              </div>
-              <div>
-                <div className="text-xs text-renal-muted mb-1">Iron Status</div>
-                <div className="text-sm">
-                  <span className="text-rs-green">Ferritin: 245 ng/mL ✓</span>
-                </div>
-                <div className="text-sm">
-                  <span className="text-rs-green">TSAT: 28% ✓</span>
+                      <div className="text-xs text-renal-muted">
+                        Started {med.startDate}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <div className="p-2 bg-renal-bg rounded">
-                <div className="text-xs text-renal-muted">ESA Responsiveness</div>
-                <div className="text-sm font-bold text-rs-green">0.85 (Normal)</div>
-              </div>
-            </div>
-          </Card>
-
-          <Card>
-            <h3 className="text-sm font-semibold text-renal-text mb-4">Mineral Bone Disease</h3>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm text-renal-muted">Calcium</span>
-                <span className="text-sm text-rs-green">8.9 mg/dL ✓</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-renal-muted">Phosphorus</span>
-                <span className="text-sm text-rs-red">6.2 mg/dL ↑</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-renal-muted">PTH</span>
-                <span className="text-sm text-rs-amber">485 pg/mL</span>
-              </div>
-              <div className="h-px bg-renal-border my-2" />
-              <div className="flex justify-between">
-                <span className="text-sm text-renal-muted">Ca×Phos</span>
-                <span className="text-sm text-rs-amber">55.2</span>
-              </div>
-              <div className="mt-3 p-2 bg-rs-red/10 rounded">
-                <div className="text-xs text-rs-red font-medium mb-1">Status: POORLY CONTROLLED</div>
-                <div className="text-xs text-renal-muted">
-                  • Increase phosphate binder dose<br />
-                  • Consider vitamin D analog
-                </div>
-              </div>
-            </div>
-          </Card>
+            );
+          })}
         </div>
-      </div>
+
+        <div className="mt-4 p-3 bg-rs-red/10 border border-rs-red/30 rounded-lg">
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 text-rs-red flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-rs-red">
+              Alert: K+ 5.8 with ACEI/ARB prescribed - review medications
+            </p>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 };

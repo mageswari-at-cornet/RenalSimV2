@@ -150,18 +150,20 @@ export const AiService = {
 
             Task: Estimate the NEW risks based on the active interventions.
             
-            CRITICAL RULES FOR REALISM:
-            1. GENERAL RULE: Clinical interventions (active levers) should REDUCE risk. Only predict an INCREASE if you identify a specific adverse interaction (e.g., 'Fluid Removal' causing 'Hypotension').
-            2. MAX REDUCTION CAP: No single intervention can reduce risk by more than 25% (relative). 
-            3. MINIMUM RISK FLOOR: Risk CANNOT drop below 2.0% for any patient.
-            4. "Cool Dialysate" reduces IDH events -> Lowers 30d mortality by ~15-20% relative to baseline.
-            5. "Access Surveillance" reduces access failure -> Lowers 90d mortality by ~5-10% relative to baseline.
-            6. "Nutrition Plan" has minimal 30d impact (< 2% reduction).
+            CRITICAL INSTRUCTIONS:
+            1. You MUST calculate the new risk scores by applying reductions.
+            2. CALCULATE TOTAL REDUCTION PERCENTAGE by summing active lever effects:
+               - "Cool Dialysate": +15% reduction
+               - "Access Surveillance": +10% reduction
+               - "Sodium Profiling": +5% reduction
+               - "UF Profiling": +5% reduction
+               - "Extend Treatment Time": +5% reduction
+            3. Apply total reduction to Baseline: New Risk = Baseline * (1 - (TotalReduction / 100))
+            4. EXAMPLE: If Cool Dialysate (15%) and UF Profiling (5%) are active, Total = 20%. New Risk = Baseline * 0.80.
 
-            FEW-SHOT EXAMPLES (Follow this logic):
-            - Example 1: Baseline 12.0%. Intervention "Cool Dialysate". Prediction -> 10.2% (Valid, ~15% drop).
-            - Example 2: Baseline 8.0%. Intervention "Access Surveillance". Prediction -> 7.5% (Valid, small drop).
-            - Example 3 (BAD): Baseline 8.0%. Intervention "Any". Prediction -> 0.2% (INVALID - Too low).
+            FEW-SHOT EXAMPLES:
+            - Baseline 30d=20.0%. Active="Cool Dialysate, UF Profiling". Total Red=20%. Result 30d=16.0%.
+            - Baseline 90d=10.0%. Active="Access Surveillance". Total Red=10%. Result 90d=9.0%.
 
             Return ONLY a JSON object with the predicted NEW risks:
             {
@@ -169,7 +171,7 @@ export const AiService = {
                 "mortalityRisk90d": number,
                 "mortalityRisk1yr": number,
                 "hospitalizationRisk30d": number,
-                "explanation": "string (concise reason for changes, e.g. 'Cool dialysate reduced IDH risk, lowering mortality by 15%')"
+                "explanation": "string (concise reason for changes)"
             }
             Do not include markdown formatting.`;
 
@@ -179,7 +181,7 @@ export const AiService = {
                     { role: 'user', content: JSON.stringify({ activeLevers }, null, 2) }
                 ],
                 model: 'llama-3.1-8b-instant',
-                temperature: 0.1,
+                temperature: 0.2,
             });
 
             const content = completion.choices[0].message.content || '{}';
@@ -202,10 +204,17 @@ export const AiService = {
                 explanation: parsed.explanation || 'Predicted based on active interventions.'
             };
 
-            // Enforce minimum floor
-            if (finalized.mortalityRisk30d < 2.0) finalized.mortalityRisk30d = 2.0;
-            if (finalized.mortalityRisk90d < 4.0) finalized.mortalityRisk90d = 4.0;
-            if (finalized.mortalityRisk1yr < 10.0) finalized.mortalityRisk1yr = 10.0;
+            // Enforce minimum floor, but never exceed patient's actual baseline
+            const floor30d = Math.min(2.0, currentMortality30d);
+            const floor90d = Math.min(4.0, currentMortality90d);
+            const floor1yr = Math.min(10.0, patient.mortalityRisk?.['1yr'] || 25.0);
+            if (finalized.mortalityRisk30d < floor30d) finalized.mortalityRisk30d = floor30d;
+            if (finalized.mortalityRisk90d < floor90d) finalized.mortalityRisk90d = floor90d;
+            if (finalized.mortalityRisk1yr < floor1yr) finalized.mortalityRisk1yr = floor1yr;
+            // Never predict higher than baseline
+            if (finalized.mortalityRisk30d > currentMortality30d) finalized.mortalityRisk30d = currentMortality30d;
+            if (finalized.mortalityRisk90d > currentMortality90d) finalized.mortalityRisk90d = currentMortality90d;
+            if (finalized.mortalityRisk1yr > (patient.mortalityRisk?.['1yr'] || 25.0)) finalized.mortalityRisk1yr = patient.mortalityRisk?.['1yr'] || 25.0;
 
             console.log('✅ Final Safe Prediction:', finalized);
             return finalized;

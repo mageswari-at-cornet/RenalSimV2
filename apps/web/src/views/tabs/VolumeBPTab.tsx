@@ -40,7 +40,7 @@ export const VolumeBPTab: React.FC<VolumeBPTabProps> = ({ patient }) => {
   const idhRate = sessions.length > 0 ? (idhSessions.length / sessions.length) * 100 : 8;
 
   const meanUFR = sessions.length > 0
-    ? sessions.reduce((acc, s) => acc + (s.ufVolume || 0), 0) / sessions.length / 70 * 1000 // ML/KG/HR (assumed 70kg)
+    ? sessions.reduce((acc, s) => acc + (s.ufVolume || 0), 0) / sessions.length / (patient.latestWeight || 70) * 1000 // ML/KG/HR
     : 5.6;
 
   const crampsRate = idhRate * 0.7; // Derived from IDH for now

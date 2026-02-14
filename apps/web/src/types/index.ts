@@ -56,7 +56,7 @@ export interface Patient {
   topRiskFactor: string;
   phenotype: string[];
   lastUpdated: string;
-  facility: 'Center A' | 'Center B' | 'Center C';
+  facility: string;
   accessType: 'AVF' | 'AVG' | 'CVC';
   archetype: string;
   access?: AccessInfo;
@@ -66,6 +66,7 @@ export interface Patient {
   sessions?: SessionData[];
   recommendations?: Recommendation[];
   dryWeight?: number;
+  latestWeight?: number;
   dataQualityScore?: number;
   accessRiskScore?: number;
 }

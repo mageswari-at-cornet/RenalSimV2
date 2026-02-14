@@ -130,12 +130,14 @@ export const PatientService = {
             const lastLabs = p.labResults[0];
             const albumin = lastLabs ? Number(lastLabs.albumin) : 4.0;
 
-            const mortalityRisk30d = calculateRisk(age, primaryAccess || 'Unknown', albumin);
-            // Derive other periods from 30d (simplified model)
-            const mortalityRisk90d = mortalityRisk30d * 2.5;
-            const mortalityRisk1yr = mortalityRisk30d * 8;
+            // Use DB risk if available, otherwise compute from formula
+            const dbMort = p.mortalityRisk as any;
+            const mortalityRisk30d = dbMort?.['30d'] ?? calculateRisk(age, primaryAccess || 'Unknown', albumin);
+            const mortalityRisk90d = dbMort?.['90d'] ?? mortalityRisk30d * 2.5;
+            const mortalityRisk1yr = dbMort?.['1yr'] ?? mortalityRisk30d * 8;
 
-            const hospitalizationRisk30d = mortalityRisk30d * 0.8;
+            const dbHosp = p.hospitalizationRisk as any;
+            const hospitalizationRisk30d = dbHosp?.['30d'] ?? mortalityRisk30d * 0.8;
             const hospitalizationRisk90d = mortalityRisk90d * 0.7;
 
             return {
@@ -146,7 +148,7 @@ export const PatientService = {
                 dialysisVintage: p.dialysisVintage || 0,
                 primaryDiagnosis: p.primaryDiagnosis || 'Unknown',
                 schedule: { daysPerWeek: p.scheduleDaysPerWeek || 3, durationPerSession: p.scheduleDurationMinutes || 240 },
-                riskLevel: mortalityRisk90d > 15 ? 'High' : mortalityRisk90d > 8 ? 'Medium' : 'Low',
+                riskLevel: p.riskLevel ?? (mortalityRisk90d > 15 ? 'High' : mortalityRisk90d > 8 ? 'Medium' : 'Low'),
                 mortalityRisk: {
                     '30d': Number(mortalityRisk30d.toFixed(1)),
                     '90d': Number(mortalityRisk90d.toFixed(1)),
@@ -168,7 +170,7 @@ export const PatientService = {
                 topRiskFactor: primaryAccess === 'CVC' ? 'Vascular Access' : albumin < 3.5 ? 'Malnutrition' : 'Age',
                 phenotype: [],
                 lastUpdated: lastSession ? new Date(lastSession.sessionDate).toISOString() : new Date().toISOString(),
-                facility: 'Center A',
+                facility: p.center || 'Unknown',
                 accessType: primaryAccess,
                 archetype: p.archetype || 'Standard'
             };
@@ -458,7 +460,7 @@ export const PatientService = {
             topRiskFactor: finalTopRisk,
             phenotype: [],
             lastUpdated: new Date().toISOString(),
-            facility: 'Center A',
+            facility: p.center || 'Unknown',
             accessType: access ? access.accessType : 'Unknown',
             archetype: p.archetype || 'Standard',
             access: access ? {
@@ -472,6 +474,7 @@ export const PatientService = {
             accessRiskScore: riskScore, // Used in AccessTab
             dataQualityScore: dataQualityScore, // Used in DataQualityTab
             dryWeight: p.dialysisSessions[0]?.dryWeight ? Number(p.dialysisSessions[0].dryWeight) : 70.0,
+            latestWeight: p.dialysisSessions[0]?.preDialysisWeight ? Number(p.dialysisSessions[0].preDialysisWeight) : 70.0,
             recommendations: aiRecommendations // Attach recommendations
         };
 

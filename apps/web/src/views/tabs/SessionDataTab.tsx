@@ -12,18 +12,20 @@ interface SessionDataTabProps {
 export const SessionDataTab: React.FC<SessionDataTabProps> = ({ patient }) => {
   const sessions = useMemo(() => (patient.sessions || []).slice(0, 12), [patient.sessions]);
 
-  // Next Session Plan state
+  const lastSession = (patient.sessions || [])[0];
+
+  // Next Session Plan state — defaults derived from last session
   const [nextSessionPlan, setNextSessionPlan] = useState({
-    duration: 248,
-    dialysateTemp: 36.44,
-    ufVolume: 1.25,
+    duration: lastSession?.duration ?? patient.schedule?.durationPerSession ?? 240,
+    dialysateTemp: lastSession?.dialysateTemp ?? 36.5,
+    ufVolume: lastSession?.ufVolume ?? 1.0,
     dialysateK: '2.5',
     sodiumProfiling: false,
   });
 
   // Calculate predicted metrics based on session plan
   const calculatePredictions = () => {
-    const patientWeight = 65; // kg
+    const patientWeight = patient.latestWeight || 65; // Use latest weight from DB
     const ufr = (nextSessionPlan.ufVolume * 1000) / (nextSessionPlan.duration / 60); // ml/hr
     const ufrPerKg = ufr / patientWeight;
 

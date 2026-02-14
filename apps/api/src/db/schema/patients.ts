@@ -17,6 +17,7 @@ export const patients = pgTable('patients', {
     scheduleDaysPerWeek: integer('schedule_days_per_week').default(3),
     scheduleDurationMinutes: integer('schedule_duration_minutes').default(240),
     archetype: varchar('archetype', { length: 255 }),
+    center: varchar('center', { length: 50 }),
 
     active: boolean('active').default(true),
     createdAt: timestamp('created_at').defaultNow(),

@@ -9,7 +9,7 @@ import { cn } from '../utils/cn';
 import { api } from '../services/api';
 import type { AlertSeverity, Patient } from '../types';
 
-type SortField = 'id' | 'name' | 'mortality30d' | 'hospitalization30d' | 'mortality90d' | 'alerts' | 'topRiskFactor' | 'facility' | 'accessType';
+type SortField = 'id' | 'name' | 'mortality30d' | 'hospitalization30d' | 'alerts' | 'topRiskFactor' | 'facility' | 'accessType';
 type SortDirection = 'asc' | 'desc';
 type FilterType = 'all' | 'high-risk' | 'alerts' | 'access-issues';
 
@@ -116,10 +116,6 @@ export const Cockpit: React.FC = () => {
           aVal = a.hospitalizationRisk['30d'];
           bVal = b.hospitalizationRisk['30d'];
           break;
-        case 'mortality90d':
-          aVal = a.mortalityRisk['90d'];
-          bVal = b.mortalityRisk['90d'];
-          break;
         case 'alerts':
           aVal = a.alerts.length;
           bVal = b.alerts.length;
@@ -154,7 +150,7 @@ export const Cockpit: React.FC = () => {
 
     // Apply mortality threshold (graph only)
     if (facilityFilters.minMortality > 0) {
-      filtered = filtered.filter(p => p.mortalityRisk['90d'] >= facilityFilters.minMortality);
+      filtered = filtered.filter(p => p.mortalityRisk['30d'] >= facilityFilters.minMortality);
     }
 
     // Apply top N limit (graph only)
@@ -309,7 +305,6 @@ export const Cockpit: React.FC = () => {
                         { field: 'accessType' as SortField, label: 'Access', width: '70px' },
                         { field: 'mortality30d' as SortField, label: '30d Mort', width: '85px' },
                         { field: 'hospitalization30d' as SortField, label: '30d Hosp', width: '85px' },
-                        { field: 'mortality90d' as SortField, label: '90d Mort', width: '85px' },
                         { field: 'alerts' as SortField, label: 'Alerts', width: '70px' },
                         { field: 'topRiskFactor' as SortField, label: 'Archetype / Risk', width: '200px' },
                       ].map((col) => (
@@ -352,9 +347,6 @@ export const Cockpit: React.FC = () => {
                         </td>
                         <td className={cn('px-3 py-3 font-mono text-sm', getRiskColor(patient.hospitalizationRisk['30d']))}>
                           {patient.hospitalizationRisk['30d'].toFixed(1)}%
-                        </td>
-                        <td className={cn('px-3 py-3 font-mono text-sm text-renal-muted')}>
-                          {patient.mortalityRisk['90d'].toFixed(1)}%
                         </td>
                         <td className="px-3 py-3">
                           {patient.alerts.length > 0 ? (

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, Bot, User } from 'lucide-react';
 import { cn } from '../../utils/cn';
 // import { detectQuestionType, generateResponse } from '../../data/chatResponses';
+import { API_Base } from '../../services/api';
 import type { Patient, ChatMessage } from '../../types';
 
 interface PatientChatProps {
@@ -43,12 +44,12 @@ export const PatientChat: React.FC<PatientChatProps> = ({ patient, isOpen: contr
       const welcomeMessage: ChatMessage = {
         id: 'welcome',
         role: 'assistant',
-        content: `Hello! Ask me anything about patient data, risks, labs, or upcoming sessions.`,
+        content: `Hello! I'm your clinical copilot. Ask me about this patient's risks, labs, sessions, or treatment plan.`,
         timestamp: new Date().toISOString(),
       };
       setMessages([welcomeMessage]);
     }
-  }, [isOpen, messages.length, patient.name]);
+  }, [isOpen, messages.length]);
 
   const handleSendMessage = async (text: string) => {
     if (!text.trim()) return;
@@ -66,7 +67,7 @@ export const PatientChat: React.FC<PatientChatProps> = ({ patient, isOpen: contr
     setIsThinking(true);
 
     try {
-      const apiResponse = await fetch('https://renalsimapi-production.up.railway.app/chat', {
+      const apiResponse = await fetch(`${API_Base}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -138,7 +139,7 @@ export const PatientChat: React.FC<PatientChatProps> = ({ patient, isOpen: contr
             <Bot className="w-4 h-4 text-white" />
           </div>
           <div>
-            <h3 className="font-semibold text-renal-text text-sm">Chat</h3>
+            <h3 className="font-semibold text-renal-text text-sm">Copilot</h3>
           </div>
         </div>
         <button
@@ -189,7 +190,7 @@ export const PatientChat: React.FC<PatientChatProps> = ({ patient, isOpen: contr
             </div>
             <div className="bg-renal-bg border border-renal-border rounded-2xl rounded-tl-sm px-3 py-2">
               <div className="flex items-center gap-2 text-renal-muted text-sm">
-                <span>Analyzing patient data</span>
+                <span>Copilot is thinking</span>
                 <span className="flex gap-1">
                   <span className="w-1.5 h-1.5 bg-rs-blue rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                   <span className="w-1.5 h-1.5 bg-rs-blue rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
