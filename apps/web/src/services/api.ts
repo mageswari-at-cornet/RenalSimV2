@@ -2,7 +2,7 @@
 import type { Patient } from '../types';
 
 // const API_Base = 'http://localhost:3001';
-const API_Base = 'renalsimapi-production.up.railway.app';
+const API_Base = 'https://renalsimapi-production.up.railway.app';
 
 export const api = {
     async getPatients(): Promise<Patient[]> {
