@@ -1,8 +1,8 @@
 
 import type { Patient } from '../types';
 
-// const API_Base = 'http://localhost:3001';
-const API_Base = 'https://renalsimapi-production.up.railway.app';
+declare const __API_BASE__: string;
+const API_Base = typeof __API_BASE__ !== 'undefined' ? __API_BASE__ : 'http://localhost:3001';
 
 export const api = {
     async getPatients(): Promise<Patient[]> {
