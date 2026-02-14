@@ -66,7 +66,7 @@ export const PatientChat: React.FC<PatientChatProps> = ({ patient, isOpen: contr
     setIsThinking(true);
 
     try {
-      const apiResponse = await fetch('http://localhost:3001/chat', {
+      const apiResponse = await fetch('https://renalsimapi-production.up.railway.app/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

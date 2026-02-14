@@ -6,6 +6,7 @@ import { KPICard } from '../components/ui/KPICard';
 import { RiskMixGraph } from '../components/charts/RiskMixGraph';
 import { FacilityFilterSection } from '../components/layout/FacilityFilterSection';
 import { cn } from '../utils/cn';
+import { api } from '../services/api';
 import type { AlertSeverity, Patient } from '../types';
 
 type SortField = 'id' | 'name' | 'mortality30d' | 'hospitalization30d' | 'mortality90d' | 'alerts' | 'topRiskFactor' | 'facility' | 'accessType';
@@ -45,11 +46,8 @@ export const Cockpit: React.FC = () => {
   React.useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const response = await fetch('http://localhost:3001/patients');
-        if (response.ok) {
-          const data = await response.json();
-          setPatients(data);
-        }
+        const data = await api.getPatients();
+        setPatients(data);
       } catch (error) {
         console.error('Failed to fetch patients', error);
       } finally {
