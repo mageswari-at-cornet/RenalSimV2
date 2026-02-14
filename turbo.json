@@ -5,6 +5,14 @@
             "dependsOn": [
                 "^build"
             ],
+            "env": [
+                "DATABASE_URL",
+                "GROK_API_KEY",
+                "PORT"
+            ],
+            "inputs": [
+                "src/**"
+            ],
             "outputs": [
                 "dist/**",
                 ".next/**",
